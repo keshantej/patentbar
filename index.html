@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4361ee">
     <title>True/False Study Quiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -747,6 +750,189 @@
                 margin-right: 4px;
             }
         }
+        html {
+            scroll-behavior: smooth;
+        }
+
+        * {
+            -webkit-tap-highlight-color: rgba(67, 97, 238, 0.2);
+        }
+
+        .desktop-only {
+            display: block;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        .mobile-help {
+            text-align: center;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .mobile-help-content {
+            background: var(--neutral);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        body.dark-mode .mobile-help-content {
+            background: #333;
+        }
+
+        .mobile-help-content p {
+            margin: 10px 0;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .btn:active, .tab:active, .review-item:active, .filter-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        /* Enhanced Mobile Media Queries */
+        @media (max-width: 768px) {
+            /* Show mobile elements, hide desktop elements */
+            .desktop-only {
+                display: none;
+            }
+            
+            .mobile-only {
+                display: block;
+            }
+            
+            #mobile-help {
+                display: block;
+            }
+            
+            /* Better spacing and layout */
+            body {
+                padding: 10px;
+            }
+            
+            .app-container {
+                max-width: 100%;
+                box-shadow: 0 5px 15px var(--shadow);
+            }
+            
+            /* Better touch targets for buttons */
+            .btn {
+                padding: 14px 20px;
+                min-height: 48px;
+                margin-bottom: 8px;
+            }
+            
+            /* Make sure bookmark button is easily tappable */
+            .bookmark-btn {
+                padding: 8px;
+                font-size: 22px;
+                top: 15px;
+                right: 15px;
+            }
+            
+            /* Improve stats section for mobile */
+            .stats {
+                padding: 15px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-gap: 15px;
+            }
+            
+            .stat-item {
+                margin-bottom: 10px;
+            }
+            
+            /* Better spacing for settings panel */
+            .settings-panel {
+                padding: 15px;
+            }
+            
+            .settings-row {
+                flex-wrap: wrap;
+            }
+            
+            /* Adjust filter buttons */
+            .filter-container {
+                flex-wrap: wrap;
+            }
+            
+            .filter-btn {
+                flex: 1 0 auto;
+                text-align: center;
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+            
+            /* Improved spacing for review items */
+            .review-item {
+                padding: 12px;
+            }
+            
+            /* Fix for the timer on small screens */
+            .timer-container {
+                margin-bottom: 10px;
+            }
+            
+            /* Better touch area for toggle switches */
+            .switch {
+                width: 52px;
+                height: 26px;
+            }
+            
+            .slider:before {
+                height: 20px;
+                width: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Extra small devices */
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .question-text {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            
+            /* Simplified tab navigation for very small screens */
+            .tab-container {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1 0 50%;
+                font-size: 12px;
+                padding: 8px 5px;
+                justify-content: center;
+            }
+            
+            /* Make keyboard shortcuts less prominent on mobile */
+            .keyboard-shortcuts {
+                font-size: 11px;
+            }
+            
+            /* Adjust feedback size */
+            .feedback {
+                font-size: 16px;
+            }
+            
+            /* Adjust explanation text */
+            .explanation {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -793,7 +979,19 @@
             <div class="card" id="question-card" style="display: none;">
                 <div class="question-number" id="question-number">Question #1</div>
                 <div class="question-text" id="question-text"></div>
-                
+                <div class="mobile-help" id="mobile-help">
+                    <button class="btn btn-toggle" onclick="toggleMobileHelp()">
+                        <i class="fas fa-question-circle"></i> How to Use
+                    </button>
+                    <div class="mobile-help-content" style="display: none;">
+                        <h3>Mobile Controls</h3>
+                        <p><i class="fas fa-hand-point-right"></i> Swipe right = True</p>
+                        <p><i class="fas fa-hand-point-left"></i> Swipe left = False</p>
+                        <p><i class="fas fa-bookmark"></i> Tap bookmark icon to save</p>
+                        <p><i class="fas fa-long-arrow-alt-right"></i> Swipe in any direction after answering to continue</p>
+                        <button class="btn btn-sm" onclick="toggleMobileHelp()">Close</button>
+                    </div>
+                </div>
                 <div class="btn-container">
                     <button class="btn btn-true" id="true-btn" onclick="checkAnswer('True')">
                         <i class="fas fa-check"></i> True (T)
@@ -988,10 +1186,16 @@
         </div>
         
         <div class="keyboard-shortcuts">
-            Keyboard shortcuts: <span class="keyboard-key">T</span> for True, 
-            <span class="keyboard-key">F</span> for False, 
-            <span class="keyboard-key">Space</span> to Continue,
-            <span class="keyboard-key">B</span> to Bookmark
+            <span class="desktop-only">
+                Keyboard shortcuts: <span class="keyboard-key">T</span> for True, 
+                <span class="keyboard-key">F</span> for False, 
+                <span class="keyboard-key">Space</span> to Continue,
+                <span class="keyboard-key">B</span> to Bookmark
+            </span>
+            <span class="mobile-only">
+                <i class="fas fa-hand-point-right"></i> Swipe right for True, 
+                <i class="fas fa-hand-point-left"></i> Swipe left for False
+            </span>
         </div>
     </div>
 
@@ -2271,7 +2475,129 @@
             // Add animation styles for confetti
             const styleSheet = document.createElement("style");
             document.head.appendChild(styleSheet);
+            initMobileOptimizations();
         });
+        // Function to toggle mobile help display
+        function toggleMobileHelp() {
+            const helpContent = document.querySelector('.mobile-help-content');
+            helpContent.style.display = helpContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Function to detect if device is mobile
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        // Add swipe gestures for answering questions
+        function addSwipeGestures() {
+            const questionCard = document.getElementById('question-card');
+            if (!questionCard) return;
+            
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            questionCard.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            questionCard.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                if (!questionAnswered) {  // Only if question hasn't been answered
+                    const swipeThreshold = 100;
+                    
+                    if (touchEndX < touchStartX - swipeThreshold) {
+                        // Swiped left = False
+                        checkAnswer('False');
+                    }
+                    
+                    if (touchEndX > touchStartX + swipeThreshold) {
+                        // Swiped right = True
+                        checkAnswer('True');
+                    }
+                } else {
+                    // If already answered, swipe to continue
+                    const swipeThreshold = 80;
+                    if (Math.abs(touchEndX - touchStartX) > swipeThreshold) {
+                        loadNextQuestion();
+                    }
+                }
+            }
+        }
+
+        // Optimize review list for mobile
+        function optimizeReviewListForMobile() {
+            if (isMobile()) {
+                const reviewList = document.getElementById('review-list');
+                if (reviewList) {
+                    // Set max-height for better mobile scrolling experience
+                    reviewList.style.maxHeight = (window.innerHeight * 0.6) + 'px';
+                }
+                
+                const bookmarksList = document.getElementById('bookmarks-list');
+                if (bookmarksList) {
+                    bookmarksList.style.maxHeight = (window.innerHeight * 0.6) + 'px';
+                }
+            }
+        }
+
+        // Function to initialize mobile optimizations
+        function initMobileOptimizations() {
+            if (isMobile()) {
+                // Add class to body for mobile-specific styles
+                document.body.classList.add('mobile-view');
+                
+                // Add touch-friendly back buttons for mobile navigation
+                const reviewContent = document.getElementById('review-content');
+                if (reviewContent && !document.getElementById('review-back-btn')) {
+                    const backBtn = document.createElement('button');
+                    backBtn.id = 'review-back-btn';
+                    backBtn.className = 'btn btn-toggle';
+                    backBtn.style.marginBottom = '15px';
+                    backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Quiz';
+                    backBtn.onclick = () => switchTab('quiz');
+                    
+                    reviewContent.insertBefore(backBtn, reviewContent.firstChild);
+                }
+                
+                const bookmarksContent = document.getElementById('bookmarks-content');
+                if (bookmarksContent && !document.getElementById('bookmarks-back-btn')) {
+                    const backBtn = document.createElement('button');
+                    backBtn.id = 'bookmarks-back-btn';
+                    backBtn.className = 'btn btn-toggle';
+                    backBtn.style.marginBottom = '15px';
+                    backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Quiz';
+                    backBtn.onclick = () => switchTab('quiz');
+                    
+                    bookmarksContent.insertBefore(backBtn, bookmarksContent.firstChild);
+                }
+                
+                const settingsContent = document.getElementById('settings-content');
+                if (settingsContent && !document.getElementById('settings-back-btn')) {
+                    const backBtn = document.createElement('button');
+                    backBtn.id = 'settings-back-btn';
+                    backBtn.className = 'btn btn-toggle';
+                    backBtn.style.marginBottom = '15px';
+                    backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Quiz';
+                    backBtn.onclick = () => switchTab('quiz');
+                    
+                    settingsContent.insertBefore(backBtn, settingsContent.firstChild);
+                }
+                
+                // Add swipe gestures
+                addSwipeGestures();
+            }
+            
+            // Handle orientation changes
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    optimizeReviewListForMobile();
+                }, 300);
+            });
+        }
     </script>
 </body>
 </html>
