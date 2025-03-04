@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4361ee">
     <title>True/False Study Quiz</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Your original CSS styles first */
         :root {
             --primary: #4361ee;
             --secondary: #3f37c9;
@@ -704,103 +706,284 @@
             opacity: 0;
         }
 
-        /* Media Queries */
+        /* IMPROVED MOBILE STYLES */
+        /* Mobile-specific helper classes */
+        .desktop-only {
+            display: block;
+        }
+        
+        .mobile-only {
+            display: none;
+        }
+        
+        /* Help button */
+        .mobile-help-btn {
+            position: fixed;
+            right: 15px;
+            bottom: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        /* Mobile help modal */
+        .mobile-help-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--light);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 200;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            display: none;
+        }
+        
+        body.dark-mode .mobile-help-modal {
+            background: #2a2a2a;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mobile-help-modal.show {
+            transform: translateY(0);
+        }
+        
+        .mobile-help-modal h3 {
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .mobile-help-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--dark);
+            cursor: pointer;
+        }
+        
+        body.dark-mode .mobile-help-close {
+            color: var(--light);
+        }
+        
+        .mobile-help-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .help-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+        
+        .help-item i {
+            width: 30px;
+            text-align: center;
+            font-size: 18px;
+            color: var(--primary);
+        }
+        
+        body.dark-mode .help-item i {
+            color: var(--success);
+        }
+        
+        /* Mobile stats bar */
+        .mobile-stats-bar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--neutral);
+            padding: 8px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 90;
+        }
+        
+        body.dark-mode .mobile-stats-bar {
+            background: #2a2a2a;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mobile-stats-content {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        
+        .mobile-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mobile-stat-item i {
+            color: var(--primary);
+        }
+        
+        body.dark-mode .mobile-stat-item i {
+            color: var(--success);
+        }
+        
+        .mobile-stat-value {
+            font-weight: bold;
+        }
+        
+        /* Bottom navigation bar */
+        .mobile-nav-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--primary);
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-nav-tabs {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .mobile-nav-tab {
+            flex: 1;
+            padding: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mobile-nav-tab.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .mobile-nav-tab i {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+        
+        .mobile-nav-badge {
+            position: absolute;
+            top: 5px;
+            right: calc(25% - 15px);
+            background: var(--false);
+            color: white;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Improved mobile question card */
+        .mobile-actions {
+            display: none;
+            margin-top: 10px;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        .hint-tap-area {
+            position: relative;
+            display: none;
+            margin-top: 15px;
+            text-align: center;
+            color: var(--dark);
+            opacity: 0.5;
+            font-size: 12px;
+        }
+        
+        body.dark-mode .hint-tap-area {
+            color: var(--light);
+        }
+        
+        /* Back buttons for mobile sections */
+        .mobile-back-btn {
+            display: none;
+            margin-bottom: 15px;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        body.dark-mode .mobile-back-btn {
+            color: var(--success);
+        }
+        
+        /* Adjust padding for mobile body */
+        body.mobile-layout {
+            padding: 5px;
+        }
+        
+        /* Add space for mobile navigation */
+        body.has-mobile-nav {
+            padding-bottom: 60px;
+            padding-top: 40px;
+        }
+        
+        /* Media queries for mobile devices */
         @media (max-width: 768px) {
+            body {
+                padding: 10px 5px;
+            }
+            
             .app-container {
-                border-radius: 8px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
             }
             
             .main {
-                padding: 20px;
+                padding: 15px;
             }
             
             .card {
                 padding: 20px;
+                margin-bottom: 15px;
             }
             
             .question-text {
                 font-size: 18px;
+                margin-bottom: 20px;
             }
             
-            .btn-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .stats {
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .tab-container {
-                padding: 0;
-            }
-
-            .tab {
-                padding: 10px;
-                font-size: 14px;
-            }
-
-            .tab i {
-                margin-right: 4px;
-            }
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-
-        * {
-            -webkit-tap-highlight-color: rgba(67, 97, 238, 0.2);
-        }
-
-        .desktop-only {
-            display: block;
-        }
-
-        .mobile-only {
-            display: none;
-        }
-
-        .mobile-help {
-            text-align: center;
-            margin: 15px 0;
-            display: none;
-        }
-
-        .mobile-help-content {
-            background: var(--neutral);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-            text-align: left;
-        }
-
-        body.dark-mode .mobile-help-content {
-            background: #333;
-        }
-
-        .mobile-help-content p {
-            margin: 10px 0;
-        }
-
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .btn:active, .tab:active, .review-item:active, .filter-btn:active {
-            transform: scale(0.98);
-            opacity: 0.9;
-        }
-
-        /* Enhanced Mobile Media Queries */
-        @media (max-width: 768px) {
             /* Show mobile elements, hide desktop elements */
             .desktop-only {
                 display: none;
@@ -810,132 +993,211 @@
                 display: block;
             }
             
-            #mobile-help {
+            .mobile-help-btn {
+                display: flex;
+            }
+            
+            .mobile-help-modal {
                 display: block;
             }
             
-            /* Better spacing and layout */
-            body {
-                padding: 10px;
+            .mobile-stats-bar {
+                display: block;
             }
             
-            .app-container {
-                max-width: 100%;
-                box-shadow: 0 5px 15px var(--shadow);
+            .mobile-nav-bar {
+                display: block;
             }
             
-            /* Better touch targets for buttons */
-            .btn {
-                padding: 14px 20px;
-                min-height: 48px;
-                margin-bottom: 8px;
+            .mobile-actions {
+                display: flex;
             }
             
-            /* Make sure bookmark button is easily tappable */
-            .bookmark-btn {
-                padding: 8px;
-                font-size: 22px;
-                top: 15px;
-                right: 15px;
+            .hint-tap-area {
+                display: block;
             }
             
-            /* Improve stats section for mobile */
+            .mobile-back-btn {
+                display: flex;
+            }
+            
+            /* Hide original tab container and stats on mobile */
+            .tab-container {
+                display: none;
+            }
+            
             .stats {
-                padding: 15px;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                grid-gap: 15px;
+                display: none;
             }
             
-            .stat-item {
-                margin-bottom: 10px;
+            .keyboard-shortcuts {
+                display: none;
             }
             
-            /* Better spacing for settings panel */
+            /* Adjust buttons for mobile */
+            .btn-container {
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 12px 15px;
+                min-height: 45px;
+                min-width: 120px;
+                font-size: 15px;
+            }
+            
+            .controls .btn {
+                min-height: 40px;
+                min-width: auto;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            /* Adjust review list for mobile */
+            .review-list, .bookmarks-list {
+                max-height: calc(100vh - 200px);
+            }
+            
+            .review-item {
+                padding: 12px;
+            }
+            
+            /* Adjust settings panel for mobile */
             .settings-panel {
                 padding: 15px;
             }
             
             .settings-row {
-                flex-wrap: wrap;
+                margin-bottom: 12px;
+                padding-bottom: 12px;
             }
             
-            /* Adjust filter buttons */
+            /* Better touch targets for mobile buttons */
+            .bookmark-btn {
+                font-size: 22px;
+                padding: 8px;
+            }
+            
+            /* Make sure explanation fits mobile screen */
+            .explanation {
+                font-size: 15px;
+                padding: 12px;
+                margin: 15px 0;
+            }
+            
+            /* Adjust filter buttons for mobile */
             .filter-container {
                 flex-wrap: wrap;
             }
             
             .filter-btn {
                 flex: 1 0 auto;
-                text-align: center;
-                padding: 8px 10px;
+                padding: 8px 12px;
                 font-size: 13px;
             }
-            
-            /* Improved spacing for review items */
-            .review-item {
-                padding: 12px;
-            }
-            
-            /* Fix for the timer on small screens */
-            .timer-container {
-                margin-bottom: 10px;
-            }
-            
-            /* Better touch area for toggle switches */
-            .switch {
-                width: 52px;
-                height: 26px;
-            }
-            
-            .slider:before {
-                height: 20px;
-                width: 20px;
-            }
         }
-
+        
         @media (max-width: 480px) {
-            /* Extra small devices */
+            /* Adjustments for very small screens */
             .header h1 {
-                font-size: 22px;
+                font-size: 20px;
+            }
+            
+            .btn-container {
+                flex-direction: row; /* Keep buttons side by side but smaller */
+            }
+            
+            .btn {
+                padding: 10px;
+                font-size: 14px;
+                min-width: 100px;
             }
             
             .question-text {
                 font-size: 16px;
-                margin-bottom: 20px;
             }
             
-            /* Simplified tab navigation for very small screens */
-            .tab-container {
-                flex-wrap: wrap;
-            }
-            
-            .tab {
-                flex: 1 0 50%;
-                font-size: 12px;
-                padding: 8px 5px;
-                justify-content: center;
-            }
-            
-            /* Make keyboard shortcuts less prominent on mobile */
-            .keyboard-shortcuts {
-                font-size: 11px;
-            }
-            
-            /* Adjust feedback size */
             .feedback {
                 font-size: 16px;
+                margin: 15px 0;
             }
             
-            /* Adjust explanation text */
-            .explanation {
-                font-size: 14px;
-                padding: 10px;
+            /* Adjust completed section for very small screens */
+            .completed h2 {
+                font-size: 22px;
             }
+            
+            .completed p {
+                font-size: 16px;
+            }
+        }
+        
+        /* Utility classes for precise layout control */
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+        
+        .mb-15 {
+            margin-bottom: 15px;
+        }
+        
+        .mt-10 {
+            margin-top: 10px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Prevent scrolling when modal is open */
+        body.modal-open {
+            overflow: hidden;
+        }
+        
+        /* Add smooth scrolling for all devices */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Better tap highlight color for mobile */
+        * {
+            -webkit-tap-highlight-color: rgba(67, 97, 238, 0.2);
         }
     </style>
 </head>
 <body>
+    <!-- Mobile stats bar -->
+    <div class="mobile-stats-bar" id="mobile-stats-bar">
+        <div class="mobile-stats-content">
+            <div class="mobile-stat-item">
+                <i class="fas fa-check"></i>
+                <span class="mobile-stat-value" id="mobile-correct-count">0</span>
+            </div>
+            <div class="mobile-stat-item">
+                <i class="fas fa-question"></i>
+                <span class="mobile-stat-value" id="mobile-question-count">0</span>
+            </div>
+            <div class="mobile-stat-item">
+                <i class="fas fa-percent"></i>
+                <span class="mobile-stat-value" id="mobile-accuracy">0%</span>
+            </div>
+            <div class="mobile-stat-item">
+                <i class="fas fa-fire"></i>
+                <span class="mobile-stat-value" id="mobile-streak-count">0</span>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <div class="header">
             <h1>True/False Study Quiz</h1>
@@ -949,17 +1211,17 @@
         </div>
         
         <div class="tab-container">
-            <div class="tab active" id="quiz-tab" onclick="switchTab('quiz')">
+            <div class="tab active" id="quiz-tab">
                 <i class="fas fa-question-circle"></i> Quiz
             </div>
-            <div class="tab" id="review-tab" onclick="switchTab('review')">
+            <div class="tab" id="review-tab">
                 <i class="fas fa-history"></i> Review
                 <span class="tab-badge" id="review-count">0</span>
             </div>
-            <div class="tab" id="bookmarks-tab" onclick="switchTab('bookmarks')">
+            <div class="tab" id="bookmarks-tab">
                 <i class="fas fa-bookmark"></i> Bookmarks
             </div>
-            <div class="tab" id="settings-tab" onclick="switchTab('settings')">
+            <div class="tab" id="settings-tab">
                 <i class="fas fa-cog"></i> Settings
             </div>
         </div>
@@ -979,53 +1241,47 @@
             <div class="card" id="question-card" style="display: none;">
                 <div class="question-number" id="question-number">Question #1</div>
                 <div class="question-text" id="question-text"></div>
-                <div class="mobile-help" id="mobile-help">
-                    <button class="btn btn-toggle" onclick="toggleMobileHelp()">
-                        <i class="fas fa-question-circle"></i> How to Use
-                    </button>
-                    <div class="mobile-help-content" style="display: none;">
-                        <h3>Mobile Controls</h3>
-                        <p><i class="fas fa-hand-point-right"></i> Swipe right = True</p>
-                        <p><i class="fas fa-hand-point-left"></i> Swipe left = False</p>
-                        <p><i class="fas fa-bookmark"></i> Tap bookmark icon to save</p>
-                        <p><i class="fas fa-long-arrow-alt-right"></i> Swipe in any direction after answering to continue</p>
-                        <button class="btn btn-sm" onclick="toggleMobileHelp()">Close</button>
-                    </div>
-                </div>
+                
                 <div class="btn-container">
-                    <button class="btn btn-true" id="true-btn" onclick="checkAnswer('True')">
-                        <i class="fas fa-check"></i> True (T)
+                    <button class="btn btn-true" id="true-btn">
+                        <i class="fas fa-check"></i> True <span class="desktop-only">(T)</span>
                     </button>
-                    <button class="btn btn-false" id="false-btn" onclick="checkAnswer('False')">
-                        <i class="fas fa-times"></i> False (F)
+                    <button class="btn btn-false" id="false-btn">
+                        <i class="fas fa-times"></i> False <span class="desktop-only">(F)</span>
                     </button>
                 </div>
                 
                 <div class="feedback" id="feedback"></div>
                 <div class="explanation" id="explanation"></div>
                 
-                <button class="btn btn-continue" id="continue-btn" onclick="loadNextQuestion()">
-                    <i class="fas fa-arrow-right"></i> Continue (Space)
+                <div class="hint-tap-area" id="hint-tap-area">Tap to continue</div>
+                
+                <button class="btn btn-continue" id="continue-btn">
+                    <i class="fas fa-arrow-right"></i> Continue <span class="desktop-only">(Space)</span>
                 </button>
             </div>
             
             <div class="completed" id="completed-section" style="display: none;">
                 <h2>Quiz Completed!</h2>
                 <p id="final-score">You answered 0 out of 0 questions correctly.</p>
-                <button class="btn btn-reset" onclick="resetQuiz()">
+                <button class="btn btn-reset" id="reset-btn">
                     <i class="fas fa-redo"></i> Restart Quiz
                 </button>
-                <button class="btn btn-continue" onclick="switchTab('review')">
+                <button class="btn btn-continue" id="review-wrong-btn">
                     <i class="fas fa-history"></i> Review Wrong Answers
                 </button>
             </div>
             
             <!-- Review Tab Content -->
             <div id="review-content" style="display: none; width: 100%;">
+                <button class="mobile-back-btn" id="review-back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Quiz
+                </button>
+                
                 <div class="filter-container">
-                    <button class="filter-btn active" onclick="filterReviewItems('all')">All</button>
-                    <button class="filter-btn" onclick="filterReviewItems('recent')">Recent</button>
-                    <button class="filter-btn" onclick="filterReviewItems('most-missed')">Most Missed</button>
+                    <button class="filter-btn active" id="filter-all">All</button>
+                    <button class="filter-btn" id="filter-recent">Recent</button>
+                    <button class="filter-btn" id="filter-most-missed">Most Missed</button>
                 </div>
                 
                 <div class="review-list" id="review-list">
@@ -1038,16 +1294,31 @@
                     <p>Questions you answer incorrectly will appear here for review.</p>
                 </div>
                 
-                <button class="btn btn-reset" onclick="clearWrongAnswers()">
-                    <i class="fas fa-trash"></i> Clear Review History
-                </button>
-                <button class="btn btn-continue" id="practice-wrong-btn" onclick="practiceWrongAnswers()">
-                    <i class="fas fa-play"></i> Practice Wrong Answers
-                </button>
+                <div class="mobile-actions" id="review-mobile-actions">
+                    <button class="btn btn-reset" id="clear-wrong-btn">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <button class="btn btn-continue" id="practice-wrong-btn">
+                        <i class="fas fa-play"></i> Practice Wrong
+                    </button>
+                </div>
+                
+                <div class="desktop-only">
+                    <button class="btn btn-reset" id="desktop-clear-wrong-btn">
+                        <i class="fas fa-trash"></i> Clear Review History
+                    </button>
+                    <button class="btn btn-continue" id="desktop-practice-wrong-btn">
+                        <i class="fas fa-play"></i> Practice Wrong Answers
+                    </button>
+                </div>
             </div>
             
             <!-- Bookmarks Tab Content -->
             <div id="bookmarks-content" style="display: none; width: 100%;">
+                <button class="mobile-back-btn" id="bookmarks-back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Quiz
+                </button>
+                
                 <div class="review-list" id="bookmarks-list">
                     <!-- Bookmarked items will be added here dynamically -->
                 </div>
@@ -1058,16 +1329,31 @@
                     <p>Click the bookmark icon in the header while viewing a question to save it for later.</p>
                 </div>
                 
-                <button class="btn btn-reset" onclick="clearBookmarks()">
-                    <i class="fas fa-trash"></i> Clear Bookmarks
-                </button>
-                <button class="btn btn-continue" onclick="practiceBookmarks()">
-                    <i class="fas fa-play"></i> Practice Bookmarks
-                </button>
+                <div class="mobile-actions" id="bookmarks-mobile-actions">
+                    <button class="btn btn-reset" id="clear-bookmarks-btn">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <button class="btn btn-continue" id="practice-bookmarks-btn">
+                        <i class="fas fa-play"></i> Practice
+                    </button>
+                </div>
+                
+                <div class="desktop-only">
+                    <button class="btn btn-reset" id="desktop-clear-bookmarks-btn">
+                        <i class="fas fa-trash"></i> Clear Bookmarks
+                    </button>
+                    <button class="btn btn-continue" id="desktop-practice-bookmarks-btn">
+                        <i class="fas fa-play"></i> Practice Bookmarks
+                    </button>
+                </div>
             </div>
             
             <!-- Settings Tab Content -->
             <div id="settings-content" class="settings-panel" style="display: none;">
+                <button class="mobile-back-btn" id="settings-back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Quiz
+                </button>
+                
                 <h3>Quiz Settings</h3>
                 
                 <div class="settings-row">
@@ -1076,7 +1362,7 @@
                     </div>
                     <div class="settings-control">
                         <label class="switch">
-                            <input type="checkbox" id="shuffle-toggle" onchange="toggleShuffle()">
+                            <input type="checkbox" id="shuffle-toggle">
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -1089,7 +1375,7 @@
                     </div>
                     <div class="settings-control">
                         <label class="switch">
-                            <input type="checkbox" id="repeat-toggle" onchange="toggleRepeat()">
+                            <input type="checkbox" id="repeat-toggle">
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -1102,7 +1388,7 @@
                     </div>
                     <div class="settings-control">
                         <label class="switch">
-                            <input type="checkbox" id="spaced-toggle" onchange="toggleSpacedRepetition()">
+                            <input type="checkbox" id="spaced-toggle">
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -1114,7 +1400,7 @@
                     </div>
                     <div class="settings-control">
                         <label class="switch">
-                            <input type="checkbox" id="timer-toggle" onchange="toggleTimer()">
+                            <input type="checkbox" id="timer-toggle">
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -1126,7 +1412,7 @@
                     </div>
                     <div class="settings-control">
                         <label class="switch">
-                            <input type="checkbox" id="dark-toggle" onchange="toggleDarkMode()">
+                            <input type="checkbox" id="dark-toggle">
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -1138,28 +1424,28 @@
                     </div>
                     <div class="settings-control">
                         <label class="switch">
-                            <input type="checkbox" id="save-toggle" onchange="toggleSaveProgress()">
+                            <input type="checkbox" id="save-toggle">
                             <span class="slider"></span>
                         </label>
                     </div>
                 </div>
                 
-                <button class="btn btn-reset" onclick="resetAllData()">
+                <button class="btn btn-reset" id="reset-all-btn">
                     <i class="fas fa-trash"></i> Reset All Data
                 </button>
             </div>
             
             <div class="controls" id="main-controls">
                 <div>
-                    <button class="btn btn-reset" onclick="resetQuiz()">
+                    <button class="btn btn-reset" id="main-reset-btn">
                         <i class="fas fa-redo"></i> Reset
                     </button>
                 </div>
                 <div>
-                    <button class="btn btn-toggle" id="shuffle-btn" onclick="toggleShuffle()">
+                    <button class="btn btn-toggle" id="shuffle-btn">
                         <i class="fas fa-random"></i> Shuffle: OFF
                     </button>
-                    <button class="btn btn-toggle" id="repeat-btn" onclick="toggleRepeat()">
+                    <button class="btn btn-toggle" id="repeat-btn">
                         <i class="fas fa-redo-alt"></i> Repeat: OFF
                     </button>
                 </div>
@@ -1192,10 +1478,59 @@
                 <span class="keyboard-key">Space</span> to Continue,
                 <span class="keyboard-key">B</span> to Bookmark
             </span>
-            <span class="mobile-only">
-                <i class="fas fa-hand-point-right"></i> Swipe right for True, 
-                <i class="fas fa-hand-point-left"></i> Swipe left for False
-            </span>
+        </div>
+    </div>
+    
+    <!-- Mobile Navigation Bar -->
+    <div class="mobile-nav-bar" id="mobile-nav-bar">
+        <div class="mobile-nav-tabs">
+            <div class="mobile-nav-tab active" id="mobile-quiz-tab">
+                <i class="fas fa-question-circle"></i>
+                Quiz
+            </div>
+            <div class="mobile-nav-tab" id="mobile-review-tab">
+                <i class="fas fa-history"></i>
+                Review
+                <span class="mobile-nav-badge" id="mobile-review-count">0</span>
+            </div>
+            <div class="mobile-nav-tab" id="mobile-bookmarks-tab">
+                <i class="fas fa-bookmark"></i>
+                Saved
+            </div>
+            <div class="mobile-nav-tab" id="mobile-settings-tab">
+                <i class="fas fa-cog"></i>
+                Settings
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Help Modal -->
+    <div class="mobile-help-modal" id="mobile-help-modal">
+        <button class="mobile-help-close" id="mobile-help-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <h3>How to Use</h3>
+        <div class="mobile-help-content">
+            <div class="help-item">
+                <i class="fas fa-thumbs-up"></i>
+                <span>Tap "True" button for true answers</span>
+            </div>
+            <div class="help-item">
+                <i class="fas fa-thumbs-down"></i>
+                <span>Tap "False" button for false answers</span>
+            </div>
+            <div class="help-item">
+                <i class="fas fa-bookmark"></i>
+                <span>Tap bookmark icon to save questions</span>
+            </div>
+            <div class="help-item">
+                <i class="fas fa-hand-point-right"></i>
+                <span>Tap question area after answering to continue</span>
+            </div>
+            <div class="help-item">
+                <i class="fas fa-arrow-right"></i>
+                <span>Use the bottom nav bar to switch modes</span>
+            </div>
         </div>
     </div>
 
@@ -1225,6 +1560,7 @@
         let reviewFilter = 'all';
         let inReviewMode = false;
         let inBookmarkMode = false;
+        let isTouchDevice = false;
         
         // DOM Elements
         const elements = {
@@ -1261,10 +1597,193 @@
             darkToggle: document.getElementById('dark-toggle'),
             saveToggle: document.getElementById('save-toggle'),
             practiceWrongBtn: document.getElementById('practice-wrong-btn'),
-            confettiContainer: document.getElementById('confetti-container')
+            confettiContainer: document.getElementById('confetti-container'),
+            
+            // Mobile elements
+            mobileStatsBar: document.getElementById('mobile-stats-bar'),
+            mobileCorrectCount: document.getElementById('mobile-correct-count'),
+            mobileQuestionCount: document.getElementById('mobile-question-count'),
+            mobileAccuracy: document.getElementById('mobile-accuracy'),
+            mobileStreakCount: document.getElementById('mobile-streak-count'),
+            mobileNavBar: document.getElementById('mobile-nav-bar'),
+            mobileNavTabs: document.querySelectorAll('.mobile-nav-tab'),
+            mobileReviewCount: document.getElementById('mobile-review-count'),
+            mobileHelpModal: document.getElementById('mobile-help-modal'),
+            hintTapArea: document.getElementById('hint-tap-area'),
+            mobileBackBtns: document.querySelectorAll('.mobile-back-btn'),
+            
+            // Tab elements
+            quizTab: document.getElementById('quiz-tab'),
+            reviewTab: document.getElementById('review-tab'),
+            bookmarksTab: document.getElementById('bookmarks-tab'),
+            settingsTab: document.getElementById('settings-tab'),
+            
+            // Mobile tab elements
+            mobileQuizTab: document.getElementById('mobile-quiz-tab'),
+            mobileReviewTab: document.getElementById('mobile-review-tab'),
+            mobileBookmarksTab: document.getElementById('mobile-bookmarks-tab'),
+            mobileSettingsTab: document.getElementById('mobile-settings-tab'),
+            
+            // More button elements
+            trueBtn: document.getElementById('true-btn'),
+            falseBtn: document.getElementById('false-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            reviewWrongBtn: document.getElementById('review-wrong-btn'),
+            clearWrongBtn: document.getElementById('clear-wrong-btn'),
+            desktopClearWrongBtn: document.getElementById('desktop-clear-wrong-btn'),
+            desktopPracticeWrongBtn: document.getElementById('desktop-practice-wrong-btn'),
+            clearBookmarksBtn: document.getElementById('clear-bookmarks-btn'),
+            practiceBookmarksBtn: document.getElementById('practice-bookmarks-btn'),
+            desktopClearBookmarksBtn: document.getElementById('desktop-clear-bookmarks-btn'),
+            desktopPracticeBookmarksBtn: document.getElementById('desktop-practice-bookmarks-btn'),
+            resetAllBtn: document.getElementById('reset-all-btn'),
+            mainResetBtn: document.getElementById('main-reset-btn'),
+            
+            // Filter buttons
+            filterAll: document.getElementById('filter-all'),
+            filterRecent: document.getElementById('filter-recent'),
+            filterMostMissed: document.getElementById('filter-most-missed'),
+            
+            // Back buttons
+            reviewBackBtn: document.getElementById('review-back-btn'),
+            bookmarksBackBtn: document.getElementById('bookmarks-back-btn'),
+            settingsBackBtn: document.getElementById('settings-back-btn'),
+            
+            // Help modal
+            mobileHelpClose: document.getElementById('mobile-help-close')
         };
-
-        // Load CSV file
+        
+        // Event listeners for all buttons and tabs
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab navigation
+            elements.quizTab.addEventListener('click', () => switchTab('quiz'));
+            elements.reviewTab.addEventListener('click', () => switchTab('review'));
+            elements.bookmarksTab.addEventListener('click', () => switchTab('bookmarks'));
+            elements.settingsTab.addEventListener('click', () => switchTab('settings'));
+            
+            // Mobile tab navigation
+            elements.mobileQuizTab.addEventListener('click', () => switchTab('quiz'));
+            elements.mobileReviewTab.addEventListener('click', () => switchTab('review'));
+            elements.mobileBookmarksTab.addEventListener('click', () => switchTab('bookmarks'));
+            elements.mobileSettingsTab.addEventListener('click', () => switchTab('settings'));
+            
+            // Answer buttons
+            elements.trueBtn.addEventListener('click', () => checkAnswer('True'));
+            elements.falseBtn.addEventListener('click', () => checkAnswer('False'));
+            
+            // Continue button
+            elements.continueBtn.addEventListener('click', loadNextQuestion);
+            
+            // Reset buttons
+            elements.resetBtn.addEventListener('click', resetQuiz);
+            elements.mainResetBtn.addEventListener('click', resetQuiz);
+            
+            // Review wrong answers button
+            elements.reviewWrongBtn.addEventListener('click', () => switchTab('review'));
+            
+            // Practice buttons
+            elements.practiceWrongBtn.addEventListener('click', practiceWrongAnswers);
+            elements.desktopPracticeWrongBtn.addEventListener('click', practiceWrongAnswers);
+            elements.practiceBookmarksBtn.addEventListener('click', practiceBookmarks);
+            elements.desktopPracticeBookmarksBtn.addEventListener('click', practiceBookmarks);
+            
+            // Clear buttons
+            elements.clearWrongBtn.addEventListener('click', clearWrongAnswers);
+            elements.desktopClearWrongBtn.addEventListener('click', clearWrongAnswers);
+            elements.clearBookmarksBtn.addEventListener('click', clearBookmarks);
+            elements.desktopClearBookmarksBtn.addEventListener('click', clearBookmarks);
+            
+            // Reset all data button
+            elements.resetAllBtn.addEventListener('click', resetAllData);
+            
+            // Bookmark button
+            elements.bookmarkBtn.addEventListener('click', toggleBookmark);
+            
+            // Filter buttons
+            elements.filterAll.addEventListener('click', () => filterReviewItems('all'));
+            elements.filterRecent.addEventListener('click', () => filterReviewItems('recent'));
+            elements.filterMostMissed.addEventListener('click', () => filterReviewItems('most-missed'));
+            
+            // Back buttons
+            elements.reviewBackBtn.addEventListener('click', () => switchTab('quiz'));
+            elements.bookmarksBackBtn.addEventListener('click', () => switchTab('quiz'));
+            elements.settingsBackBtn.addEventListener('click', () => switchTab('quiz'));
+            
+            // Toggle switches
+            elements.shuffleToggle.addEventListener('change', toggleShuffle);
+            elements.repeatToggle.addEventListener('change', toggleRepeat);
+            elements.spacedToggle.addEventListener('change', toggleSpacedRepetition);
+            elements.timerToggle.addEventListener('change', toggleTimer);
+            elements.darkToggle.addEventListener('change', toggleDarkMode);
+            elements.saveToggle.addEventListener('change', toggleSaveProgress);
+            
+            // Toggle buttons
+            elements.shuffleBtn.addEventListener('click', toggleShuffle);
+            elements.repeatBtn.addEventListener('click', toggleRepeat);
+            
+            // Help modal
+            if (elements.mobileHelpClose) {
+                elements.mobileHelpClose.addEventListener('click', toggleMobileHelp);
+            }
+            
+            // Detect if device is touch capable
+            isTouchDevice = detectTouchCapability();
+            
+            // Initialize mobile layout
+            initMobileLayout();
+            
+            // Handle window resize events
+            window.addEventListener('resize', function() {
+                optimizeListHeights();
+                
+                // Update mobile layout class
+                if (isMobile()) {
+                    document.body.classList.add('mobile-layout');
+                    document.body.classList.add('has-mobile-nav');
+                } else {
+                    document.body.classList.remove('mobile-layout');
+                    document.body.classList.remove('has-mobile-nav');
+                }
+            });
+            
+            // Handle orientation change events
+            window.addEventListener('orientationchange', function() {
+                setTimeout(optimizeListHeights, 300);
+            });
+            
+            // Load questions
+            loadCSV();
+            
+            // Add animation styles for confetti
+            const styleSheet = document.createElement("style");
+            document.head.appendChild(styleSheet);
+            
+            // Handle keyboard shortcuts
+            document.addEventListener('keydown', (event) => {
+                // Prevent default actions for our shortcuts
+                if (['t', 'f', ' ', 'b'].includes(event.key.toLowerCase())) {
+                    event.preventDefault();
+                }
+                
+                // Only allow keyboard shortcuts if question card is visible
+                if (elements.questionCard.style.display === 'block') {
+                    if (!questionAnswered && event.key.toLowerCase() === 't') {
+                        checkAnswer('True');
+                    }
+                    else if (!questionAnswered && event.key.toLowerCase() === 'f') {
+                        checkAnswer('False');
+                    }
+                    else if (questionAnswered && event.key === ' ') {
+                        loadNextQuestion();
+                    }
+                    else if (event.key.toLowerCase() === 'b') {
+                        toggleBookmark();
+                    }
+                }
+            });
+        });
+        
+        // Load CSV file - replaced with direct sample loading for fixing the issues
         async function loadCSV() {
             try {
                 // Show loading state
@@ -1301,7 +1820,7 @@
             }
         }
         
-        // Fallback function to load sample questions if CSV fails
+        // Load Sample Questions
         function loadSampleQuestions() {
             console.log("Loading sample questions...");
             originalQuestions = [
@@ -1347,11 +1866,15 @@
                 q.id = `sample-${index}`;
             });
             
+            // Hide loading section
+            elements.loadingSection.style.display = 'none';
+            elements.questionCard.style.display = 'block';
+            
             // Reset and initialize with sample questions
             resetQuiz();
         }
 
-        // Parse CSV
+        // Parse CSV (for future use)
         function parseCSV(text) {
             console.log("Parsing CSV text:", text.slice(0, 100) + "..."); // Log first 100 chars
             
@@ -1399,7 +1922,7 @@
             resetQuiz();
         }
 
-        // Shuffle array helper function
+        // Shuffle Array
         function shuffleArray(array) {
             // Create a copy of the array
             const newArray = [...array];
@@ -1413,7 +1936,7 @@
             return newArray;
         }
 
-        // Toggle shuffle mode
+        // Toggle Functions
         function toggleShuffle() {
             shuffleMode = !shuffleMode;
             
@@ -1434,7 +1957,6 @@
             saveSettings();
         }
 
-        // Toggle repeat mode
         function toggleRepeat() {
             repeatMode = !repeatMode;
             
@@ -1454,13 +1976,11 @@
             saveSettings();
         }
         
-        // Toggle spaced repetition mode
         function toggleSpacedRepetition() {
             spacedRepetitionMode = !spacedRepetitionMode;
             saveSettings();
         }
         
-        // Toggle timer mode
         function toggleTimer() {
             timerMode = !timerMode;
             
@@ -1475,7 +1995,6 @@
             saveSettings();
         }
         
-        // Toggle dark mode
         function toggleDarkMode() {
             darkMode = !darkMode;
             
@@ -1488,7 +2007,6 @@
             saveSettings();
         }
         
-        // Toggle save progress mode
         function toggleSaveProgress() {
             saveProgressMode = !saveProgressMode;
             
@@ -1499,7 +2017,19 @@
             saveSettings();
         }
         
-        // Timer functions
+        function toggleMobileHelp() {
+            const helpModal = elements.mobileHelpModal;
+            
+            if (helpModal.classList.contains('show')) {
+                helpModal.classList.remove('show');
+                document.body.classList.remove('modal-open');
+            } else {
+                helpModal.classList.add('show');
+                document.body.classList.add('modal-open');
+            }
+        }
+        
+        // Timer Functions
         function startTimer() {
             if (!timerMode) return;
             
@@ -1525,7 +2055,7 @@
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
         
-        // Bookmark current question
+        // Bookmark Functions
         function toggleBookmark() {
             if (currentIndex >= questions.length) return;
             
@@ -1548,7 +2078,6 @@
             saveBookmarks();
         }
         
-        // Update bookmark button state for current question
         function updateBookmarkButton() {
             if (currentIndex >= questions.length) return;
             
@@ -1564,13 +2093,18 @@
             }
         }
 
-        // Load next question
+        // Question Functions
         function loadNextQuestion() {
             // Reset question state
             questionAnswered = false;
             elements.feedback.style.opacity = '0';
             elements.explanation.style.display = 'none';
             elements.continueBtn.style.display = 'none';
+            
+            // For mobile
+            if (elements.hintTapArea) {
+                elements.hintTapArea.style.display = 'none';
+            }
             
             // Move to next question
             currentIndex++;
@@ -1608,7 +2142,6 @@
             displayCurrentQuestion();
         }
         
-        // Prioritize wrong answers for spaced repetition
         function prioritizeWrongAnswers() {
             // Get the IDs of wrong answers
             const wrongIds = wrongAnswers.map(q => q.id);
@@ -1628,7 +2161,6 @@
             });
         }
 
-        // Display current question
         function displayCurrentQuestion() {
             const currentQuestion = questions[currentIndex];
             
@@ -1655,7 +2187,6 @@
             }
         }
 
-        // Check answer
         function checkAnswer(userAnswer) {
             // Prevent multiple answers for the same question
             if (questionAnswered) return;
@@ -1666,6 +2197,11 @@
             
             // Update question count stats
             elements.questionCount.innerText = answeredCount;
+            
+            // Update mobile stats
+            if (elements.mobileQuestionCount) {
+                elements.mobileQuestionCount.innerText = answeredCount;
+            }
             
             // Check if answer is correct
             const isCorrect = userAnswer === currentQuestion.answer;
@@ -1689,12 +2225,17 @@
                 elements.feedback.innerHTML = '<span class="status-icon">✅</span> Correct!';
                 elements.feedback.style.color = 'var(--true)';
                 
+                // Update mobile stats
+                if (elements.mobileCorrectCount) {
+                    elements.mobileCorrectCount.innerText = correctCount;
+                }
+                if (elements.mobileStreakCount) {
+                    elements.mobileStreakCount.innerText = currentStreak;
+                }
+                
                 // If this question was previously in wrong answers, update its status
                 const wrongIndex = wrongAnswers.findIndex(q => q.id === currentQuestion.id);
                 if (wrongIndex !== -1) {
-                    // Option 1: Remove from wrong answers once corrected
-                    // wrongAnswers.splice(wrongIndex, 1);
-                    
                     // Option 2: Keep in wrong answers but mark as corrected
                     wrongAnswers[wrongIndex].corrected = true;
                     wrongAnswers[wrongIndex].correctedAt = new Date().toISOString();
@@ -1708,6 +2249,11 @@
                 elements.streakCount.innerText = currentStreak;
                 elements.feedback.innerHTML = '<span class="status-icon">❌</span> Incorrect';
                 elements.feedback.style.color = 'var(--false)';
+                
+                // Update mobile stats
+                if (elements.mobileStreakCount) {
+                    elements.mobileStreakCount.innerText = currentStreak;
+                }
                 
                 // Increment miss count for this question
                 if (currentQuestion.missCount === undefined) {
@@ -1747,17 +2293,31 @@
             elements.feedback.style.opacity = '1';
             elements.continueBtn.style.display = 'inline-flex';
             
+            // For mobile, show tap-to-continue hint
+            if (isMobile() && elements.hintTapArea) {
+                elements.hintTapArea.style.display = 'block';
+            }
+            
             // Update accuracy
-            elements.accuracy.innerText = calculateAccuracy();
+            const accuracyValue = calculateAccuracy();
+            elements.accuracy.innerText = accuracyValue;
+            
+            // Update mobile accuracy
+            if (elements.mobileAccuracy) {
+                elements.mobileAccuracy.innerText = accuracyValue;
+            }
+            
+            // Make the question card tappable to continue on mobile
+            if (isMobile()) {
+                makeTappableToContinue();
+            }
         }
 
-        // Calculate accuracy percentage
         function calculateAccuracy() {
             if (answeredCount === 0) return '0';
             return ((correctCount / answeredCount) * 100).toFixed(1);
         }
 
-        // Reset quiz
         function resetQuiz() {
             // Stop the timer if it's running
             stopTimer();
@@ -1780,6 +2340,13 @@
             elements.accuracy.innerText = '0%';
             elements.streakCount.innerText = '0';
             elements.progressBar.style.width = '0%';
+            
+            // Reset mobile UI
+            if (elements.mobileCorrectCount) elements.mobileCorrectCount.innerText = '0';
+            if (elements.mobileQuestionCount) elements.mobileQuestionCount.innerText = '0';
+            if (elements.mobileAccuracy) elements.mobileAccuracy.innerText = '0%';
+            if (elements.mobileStreakCount) elements.mobileStreakCount.innerText = '0';
+            if (elements.hintTapArea) elements.hintTapArea.style.display = 'none';
             
             // Show question card, hide completed section
             elements.questionCard.style.display = 'block';
@@ -1812,7 +2379,7 @@
             switchTab('quiz');
         }
         
-        // Practice wrong answers
+        // Practice functions
         function practiceWrongAnswers() {
             if (wrongAnswers.length === 0) return;
             
@@ -1848,6 +2415,13 @@
             elements.streakCount.innerText = '0';
             elements.progressBar.style.width = '0%';
             
+            // Reset mobile UI
+            if (elements.mobileCorrectCount) elements.mobileCorrectCount.innerText = '0';
+            if (elements.mobileQuestionCount) elements.mobileQuestionCount.innerText = '0';
+            if (elements.mobileAccuracy) elements.mobileAccuracy.innerText = '0%';
+            if (elements.mobileStreakCount) elements.mobileStreakCount.innerText = '0';
+            if (elements.hintTapArea) elements.hintTapArea.style.display = 'none';
+            
             // Show question card
             elements.questionCard.style.display = 'block';
             elements.completedSection.style.display = 'none';
@@ -1866,7 +2440,6 @@
             }
         }
         
-        // Practice bookmarked questions
         function practiceBookmarks() {
             if (bookmarkedQuestions.length === 0) return;
             
@@ -1894,6 +2467,13 @@
             elements.streakCount.innerText = '0';
             elements.progressBar.style.width = '0%';
             
+            // Reset mobile UI
+            if (elements.mobileCorrectCount) elements.mobileCorrectCount.innerText = '0';
+            if (elements.mobileQuestionCount) elements.mobileQuestionCount.innerText = '0';
+            if (elements.mobileAccuracy) elements.mobileAccuracy.innerText = '0%';
+            if (elements.mobileStreakCount) elements.mobileStreakCount.innerText = '0';
+            if (elements.hintTapArea) elements.hintTapArea.style.display = 'none';
+            
             // Show question card
             elements.questionCard.style.display = 'block';
             elements.completedSection.style.display = 'none';
@@ -1912,7 +2492,7 @@
             }
         }
         
-        // Filter review items
+        // Filter and UI functions
         function filterReviewItems(filter) {
             reviewFilter = filter;
             updateReviewUI();
@@ -1922,20 +2502,44 @@
                 btn.classList.remove('active');
             });
             
-            event.target.classList.add('active');
+            // Find the button that matches the filter and make it active
+            if (filter === 'all') {
+                elements.filterAll.classList.add('active');
+            } else if (filter === 'recent') {
+                elements.filterRecent.classList.add('active');
+            } else if (filter === 'most-missed') {
+                elements.filterMostMissed.classList.add('active');
+            }
         }
         
-        // Update review UI
         function updateReviewUI() {
             // Update review count badge
             const uncorrectedCount = wrongAnswers.filter(q => !q.corrected).length;
             elements.reviewCount.textContent = uncorrectedCount;
+            
+            // Update mobile badge
+            if (elements.mobileReviewCount) {
+                elements.mobileReviewCount.textContent = uncorrectedCount;
+                
+                // Show/hide the badge based on count
+                if (uncorrectedCount > 0) {
+                    elements.mobileReviewCount.style.display = 'flex';
+                } else {
+                    elements.mobileReviewCount.style.display = 'none';
+                }
+            }
             
             // If review list is empty, show empty state
             if (wrongAnswers.length === 0) {
                 elements.reviewEmpty.style.display = 'block';
                 elements.reviewList.innerHTML = '';
                 elements.practiceWrongBtn.disabled = true;
+                
+                // Update desktop practice button
+                if (elements.desktopPracticeWrongBtn) {
+                    elements.desktopPracticeWrongBtn.disabled = true;
+                }
+                
                 return;
             }
             
@@ -1963,7 +2567,7 @@
                     `<span style="color: var(--false);"><i class="fas fa-times-circle"></i> Missed ${missCount} ${missCount === 1 ? 'time' : 'times'}</span>`;
                 
                 return `
-                    <div class="review-item ${correctedClass}" onclick="reviewQuestion('${q.id}')">
+                    <div class="review-item ${correctedClass}" data-id="${q.id}">
                         <div class="review-item-question">${q.question}</div>
                         <div class="review-item-meta">
                             <div>
@@ -1981,9 +2585,21 @@
             elements.reviewList.innerHTML = reviewHTML;
             elements.reviewEmpty.style.display = 'none';
             elements.practiceWrongBtn.disabled = wrongAnswers.filter(q => !q.corrected).length === 0;
+            
+            // Add click event listeners to review items
+            document.querySelectorAll('.review-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const questionId = item.dataset.id;
+                    reviewQuestion(questionId);
+                });
+            });
+            
+            // Update desktop practice button
+            if (elements.desktopPracticeWrongBtn) {
+                elements.desktopPracticeWrongBtn.disabled = wrongAnswers.filter(q => !q.corrected).length === 0;
+            }
         }
         
-        // Update bookmarks UI
         function updateBookmarksUI() {
             // If bookmarks list is empty, show empty state
             if (bookmarkedQuestions.length === 0) {
@@ -1995,7 +2611,7 @@
             // Generate HTML for bookmarked items
             const bookmarksHTML = bookmarkedQuestions.map(q => {
                 return `
-                    <div class="review-item" onclick="reviewBookmark('${q.id}')">
+                    <div class="review-item" data-id="${q.id}">
                         <div class="review-item-question">${q.question}</div>
                         <div class="review-item-meta">
                             <div>
@@ -2012,9 +2628,17 @@
             // Update UI
             elements.bookmarksList.innerHTML = bookmarksHTML;
             elements.bookmarksEmpty.style.display = 'none';
+            
+            // Add click event listeners to bookmarked items
+            document.querySelectorAll('#bookmarks-list .review-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const questionId = item.dataset.id;
+                    reviewBookmark(questionId);
+                });
+            });
         }
         
-        // Review a specific question
+        // Review functions
         function reviewQuestion(questionId) {
             const questionIndex = questions.findIndex(q => q.id === questionId);
             
@@ -2049,6 +2673,13 @@
             elements.accuracy.innerText = '0%';
             elements.progressBar.style.width = '0%';
             
+            // Reset mobile UI
+            if (elements.mobileCorrectCount) elements.mobileCorrectCount.innerText = '0';
+            if (elements.mobileQuestionCount) elements.mobileQuestionCount.innerText = '0';
+            if (elements.mobileAccuracy) elements.mobileAccuracy.innerText = '0%';
+            if (elements.mobileStreakCount) elements.mobileStreakCount.innerText = '0';
+            if (elements.hintTapArea) elements.hintTapArea.style.display = 'none';
+            
             // Show question card
             elements.questionCard.style.display = 'block';
             elements.completedSection.style.display = 'none';
@@ -2060,7 +2691,6 @@
             displayCurrentQuestion();
         }
         
-        // Review a bookmarked question
         function reviewBookmark(questionId) {
             // Find the question in bookmarks
             const question = bookmarkedQuestions.find(q => q.id === questionId);
@@ -2086,6 +2716,13 @@
             elements.accuracy.innerText = '0%';
             elements.progressBar.style.width = '0%';
             
+            // Reset mobile UI
+            if (elements.mobileCorrectCount) elements.mobileCorrectCount.innerText = '0';
+            if (elements.mobileQuestionCount) elements.mobileQuestionCount.innerText = '0';
+            if (elements.mobileAccuracy) elements.mobileAccuracy.innerText = '0%';
+            if (elements.mobileStreakCount) elements.mobileStreakCount.innerText = '0';
+            if (elements.hintTapArea) elements.hintTapArea.style.display = 'none';
+            
             // Show question card
             elements.questionCard.style.display = 'block';
             elements.completedSection.style.display = 'none';
@@ -2097,7 +2734,7 @@
             displayCurrentQuestion();
         }
         
-        // Switch between tabs
+        // Tab switching
         function switchTab(tabName) {
             currentTab = tabName;
             
@@ -2114,8 +2751,19 @@
                 tab.classList.remove('active');
             });
             
+            // Remove active class from all mobile tabs
+            document.querySelectorAll('.mobile-nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
             // Set active tab
             document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Set active mobile tab
+            const mobileTab = document.getElementById(`mobile-${tabName}-tab`);
+            if (mobileTab) {
+                mobileTab.classList.add('active');
+            }
             
             // Show selected tab content
             if (tabName === 'quiz') {
@@ -2128,8 +2776,8 @@
                     elements.completedSection.style.display = 'block';
                 }
                 
-                // Show main controls in quiz mode
-                if (elements.mainControls) {
+                // Show main controls in quiz mode on desktop
+                if (elements.mainControls && !isMobile()) {
                     elements.mainControls.style.display = 'flex';
                 }
             } 
@@ -2146,7 +2794,7 @@
             }
         }
         
-        // Clear wrong answers history
+        // Data functions
         function clearWrongAnswers() {
             if (confirm("Are you sure you want to clear your wrong answers history?")) {
                 wrongAnswers = [];
@@ -2155,7 +2803,6 @@
             }
         }
         
-        // Clear bookmarks
         function clearBookmarks() {
             if (confirm("Are you sure you want to clear all your bookmarks?")) {
                 bookmarkedQuestions = [];
@@ -2164,7 +2811,6 @@
             }
         }
         
-        // Reset all app data
         function resetAllData() {
             if (confirm("Are you sure you want to reset all data? This will clear your wrong answers, bookmarks, settings, and progress.")) {
                 localStorage.removeItem('truefalse_wrong_answers');
@@ -2202,21 +2848,19 @@
             }
         }
         
-        // Save wrong answers to localStorage
+        // Storage functions
         function saveWrongAnswers() {
             if (typeof localStorage !== 'undefined') {
                 localStorage.setItem('truefalse_wrong_answers', JSON.stringify(wrongAnswers));
             }
         }
         
-        // Save bookmarks to localStorage
         function saveBookmarks() {
             if (typeof localStorage !== 'undefined') {
                 localStorage.setItem('truefalse_bookmarks', JSON.stringify(bookmarkedQuestions));
             }
         }
         
-        // Save quiz state to localStorage
         function saveQuizState() {
             if (typeof localStorage !== 'undefined' && saveProgressMode) {
                 const state = {
@@ -2232,7 +2876,6 @@
             }
         }
         
-        // Save settings to localStorage
         function saveSettings() {
             if (typeof localStorage !== 'undefined') {
                 const settings = {
@@ -2248,7 +2891,6 @@
             }
         }
         
-        // Load saved data from localStorage
         function loadSavedData() {
             if (typeof localStorage !== 'undefined') {
                 // Load settings
@@ -2314,6 +2956,9 @@
                             elements.questionCount.innerText = answeredCount;
                             elements.accuracy.innerText = calculateAccuracy();
                             elements.streakCount.innerText = currentStreak;
+                            
+                            // Update mobile stats
+                            updateMobileStats();
                         }
                     } catch (e) {
                         console.error('Error loading quiz state:', e);
@@ -2327,7 +2972,6 @@
             }
         }
         
-        // Update settings UI
         function updateSettingsUI() {
             // Update toggle switches
             elements.shuffleToggle.checked = shuffleMode;
@@ -2366,7 +3010,7 @@
             }
         }
         
-        // Create confetti effect for streak celebrations
+        // Confetti effect
         function createConfetti() {
             const confettiContainer = document.getElementById('confetti-container');
             confettiContainer.innerHTML = '';
@@ -2440,163 +3084,80 @@
                 document.head.removeChild(style);
             }, 5000);
         }
-
-        // Handle keyboard shortcuts
-        document.addEventListener('keydown', (event) => {
-            // Prevent default actions for our shortcuts
-            if (['t', 'f', ' ', 'b'].includes(event.key.toLowerCase())) {
-                event.preventDefault();
-            }
-            
-            // Only allow keyboard shortcuts if question card is visible
-            if (elements.questionCard.style.display === 'block') {
-                if (!questionAnswered && event.key.toLowerCase() === 't') {
-                    checkAnswer('True');
-                }
-                else if (!questionAnswered && event.key.toLowerCase() === 'f') {
-                    checkAnswer('False');
-                }
-                else if (questionAnswered && event.key === ' ') {
-                    loadNextQuestion();
-                }
-                else if (event.key.toLowerCase() === 'b') {
-                    toggleBookmark();
-                }
-            }
-        });
         
-        // Add event listener for bookmark button
-        document.getElementById('bookmark-btn').addEventListener('click', toggleBookmark);
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCSV();
-            
-            // Add animation styles for confetti
-            const styleSheet = document.createElement("style");
-            document.head.appendChild(styleSheet);
-            initMobileOptimizations();
-        });
-        // Function to toggle mobile help display
-        function toggleMobileHelp() {
-            const helpContent = document.querySelector('.mobile-help-content');
-            helpContent.style.display = helpContent.style.display === 'none' ? 'block' : 'none';
-        }
-
-        // Function to detect if device is mobile
+        // Mobile-specific functions
         function isMobile() {
             return window.innerWidth <= 768;
         }
-
-        // Add swipe gestures for answering questions
-        function addSwipeGestures() {
+        
+        function makeTappableToContinue() {
+            if (!questionAnswered) return;
+            
             const questionCard = document.getElementById('question-card');
-            if (!questionCard) return;
             
-            let touchStartX = 0;
-            let touchEndX = 0;
+            // Remove any existing click listener first
+            questionCard.removeEventListener('click', handleTapToContinue);
             
-            questionCard.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, false);
+            // Add the click listener
+            questionCard.addEventListener('click', handleTapToContinue);
+        }
+        
+        function handleTapToContinue(event) {
+            // Don't trigger if clicking on buttons
+            if (event.target.tagName === 'BUTTON' || 
+                event.target.closest('button') || 
+                !questionAnswered) {
+                return;
+            }
             
-            questionCard.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            }, false);
+            // Load next question
+            loadNextQuestion();
             
-            function handleSwipe() {
-                if (!questionAnswered) {  // Only if question hasn't been answered
-                    const swipeThreshold = 100;
-                    
-                    if (touchEndX < touchStartX - swipeThreshold) {
-                        // Swiped left = False
-                        checkAnswer('False');
-                    }
-                    
-                    if (touchEndX > touchStartX + swipeThreshold) {
-                        // Swiped right = True
-                        checkAnswer('True');
-                    }
-                } else {
-                    // If already answered, swipe to continue
-                    const swipeThreshold = 80;
-                    if (Math.abs(touchEndX - touchStartX) > swipeThreshold) {
-                        loadNextQuestion();
-                    }
-                }
+            // Remove the event listener after use
+            event.currentTarget.removeEventListener('click', handleTapToContinue);
+        }
+        
+        function initMobileLayout() {
+            if (isMobile()) {
+                document.body.classList.add('mobile-layout');
+                document.body.classList.add('has-mobile-nav');
+                
+                // Update the stats once on init
+                updateMobileStats();
+                
+                // Make review list height fit properly on mobile
+                optimizeListHeights();
             }
         }
-
-        // Optimize review list for mobile
-        function optimizeReviewListForMobile() {
-            if (isMobile()) {
-                const reviewList = document.getElementById('review-list');
-                if (reviewList) {
-                    // Set max-height for better mobile scrolling experience
-                    reviewList.style.maxHeight = (window.innerHeight * 0.6) + 'px';
-                }
-                
-                const bookmarksList = document.getElementById('bookmarks-list');
-                if (bookmarksList) {
-                    bookmarksList.style.maxHeight = (window.innerHeight * 0.6) + 'px';
-                }
-            }
+        
+        function updateMobileStats() {
+            if (!isMobile()) return;
+            
+            if (elements.mobileCorrectCount) elements.mobileCorrectCount.innerText = correctCount;
+            if (elements.mobileQuestionCount) elements.mobileQuestionCount.innerText = answeredCount;
+            if (elements.mobileAccuracy) elements.mobileAccuracy.innerText = calculateAccuracy() + '%';
+            if (elements.mobileStreakCount) elements.mobileStreakCount.innerText = currentStreak;
         }
-
-        // Function to initialize mobile optimizations
-        function initMobileOptimizations() {
-            if (isMobile()) {
-                // Add class to body for mobile-specific styles
-                document.body.classList.add('mobile-view');
-                
-                // Add touch-friendly back buttons for mobile navigation
-                const reviewContent = document.getElementById('review-content');
-                if (reviewContent && !document.getElementById('review-back-btn')) {
-                    const backBtn = document.createElement('button');
-                    backBtn.id = 'review-back-btn';
-                    backBtn.className = 'btn btn-toggle';
-                    backBtn.style.marginBottom = '15px';
-                    backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Quiz';
-                    backBtn.onclick = () => switchTab('quiz');
-                    
-                    reviewContent.insertBefore(backBtn, reviewContent.firstChild);
-                }
-                
-                const bookmarksContent = document.getElementById('bookmarks-content');
-                if (bookmarksContent && !document.getElementById('bookmarks-back-btn')) {
-                    const backBtn = document.createElement('button');
-                    backBtn.id = 'bookmarks-back-btn';
-                    backBtn.className = 'btn btn-toggle';
-                    backBtn.style.marginBottom = '15px';
-                    backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Quiz';
-                    backBtn.onclick = () => switchTab('quiz');
-                    
-                    bookmarksContent.insertBefore(backBtn, bookmarksContent.firstChild);
-                }
-                
-                const settingsContent = document.getElementById('settings-content');
-                if (settingsContent && !document.getElementById('settings-back-btn')) {
-                    const backBtn = document.createElement('button');
-                    backBtn.id = 'settings-back-btn';
-                    backBtn.className = 'btn btn-toggle';
-                    backBtn.style.marginBottom = '15px';
-                    backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Back to Quiz';
-                    backBtn.onclick = () => switchTab('quiz');
-                    
-                    settingsContent.insertBefore(backBtn, settingsContent.firstChild);
-                }
-                
-                // Add swipe gestures
-                addSwipeGestures();
+        
+        function optimizeListHeights() {
+            if (!isMobile()) return;
+            
+            const reviewList = document.getElementById('review-list');
+            const bookmarksList = document.getElementById('bookmarks-list');
+            
+            if (reviewList) {
+                reviewList.style.maxHeight = `${window.innerHeight - 200}px`;
             }
             
-            // Handle orientation changes
-            window.addEventListener('orientationchange', function() {
-                setTimeout(() => {
-                    optimizeReviewListForMobile();
-                }, 300);
-            });
+            if (bookmarksList) {
+                bookmarksList.style.maxHeight = `${window.innerHeight - 200}px`;
+            }
+        }
+        
+        function detectTouchCapability() {
+            return ('ontouchstart' in window) || 
+                   (navigator.maxTouchPoints > 0) || 
+                   (navigator.msMaxTouchPoints > 0);
         }
     </script>
 </body>
