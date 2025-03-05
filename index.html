@@ -1560,7 +1560,7 @@
 
         // Function to save question timing data
         function saveQuestionData() {
-            if (typeof localStorage !== 'undefined') {
+            try {
                 // Save full question data including lastSeen timestamps and missCount
                 const questionData = questions.map(q => {
                     return {
@@ -1570,58 +1570,54 @@
                     };
                 });
                 
-                localStorage.setItem('truefalse_question_data', JSON.stringify(questionData));
+                safeLocalStorage('set', 'truefalse_question_data', JSON.stringify(questionData));
+            } catch (e) {
+                console.error('Error saving question data:', e);
             }
         }
 
         // Load question data and merge with current questions
         function loadQuestionData() {
-            if (typeof localStorage !== 'undefined') {
-                try {
-                    const savedData = localStorage.getItem('truefalse_question_data');
-                    if (savedData) {
-                        const questionData = JSON.parse(savedData);
-                        
-                        // Update the questions with saved data
-                        questions.forEach(question => {
-                            const savedQuestion = questionData.find(q => q.id === question.id);
-                            if (savedQuestion) {
-                                question.lastSeen = savedQuestion.lastSeen;
-                                question.missCount = savedQuestion.missCount;
-                            }
-                        });
-                        
-                        console.log('Question timing data loaded successfully');
-                    }
-                } catch (e) {
-                    console.error('Error loading question data:', e);
+            try {
+                const savedData = safeLocalStorage('get', 'truefalse_question_data');
+                if (savedData) {
+                    const questionData = JSON.parse(savedData);
+                    
+                    // Update the questions with saved data
+                    questions.forEach(question => {
+                        const savedQuestion = questionData.find(q => q.id === question.id);
+                        if (savedQuestion) {
+                            question.lastSeen = savedQuestion.lastSeen;
+                            question.missCount = savedQuestion.missCount;
+                        }
+                    });
+                    
+                    console.log('Question timing data loaded successfully');
                 }
+            } catch (e) {
+                console.error('Error loading question data:', e);
             }
         }
 
         // Load statistics data
         function loadStatistics() {
-            if (typeof localStorage !== 'undefined') {
-                try {
-                    const savedStats = localStorage.getItem('truefalse_global_stats');
-                    if (savedStats) {
-                        globalStats = JSON.parse(savedStats);
-                        console.log('Statistics loaded successfully');
-                        
-                        // Clean up any existing zero-question sessions
-                        cleanupSessionHistory();
-                    }
-                } catch (e) {
-                    console.error('Error loading statistics:', e);
+            try {
+                const savedStats = safeLocalStorage('get', 'truefalse_global_stats');
+                if (savedStats) {
+                    globalStats = JSON.parse(savedStats);
+                    console.log('Statistics loaded successfully');
+                    
+                    // Clean up any existing zero-question sessions
+                    cleanupSessionHistory();
                 }
+            } catch (e) {
+                console.error('Error loading statistics:', e);
             }
         }
 
         // Save statistics data
         function saveStatistics() {
-            if (typeof localStorage !== 'undefined') {
-                localStorage.setItem('truefalse_global_stats', JSON.stringify(globalStats));
-            }
+            safeLocalStorage('set', 'truefalse_global_stats', JSON.stringify(globalStats));
         }
         function updateSessionStats(isCorrect) {
             // Make sure we have an active session
@@ -2031,6 +2027,12 @@
 
             // Add statistics styles
             addStatisticsStyles();
+
+            // Add Safari mobile compatibility styles
+            addMobileSafariStyles();
+
+            // Ensure statistics tabs exist
+            ensureStatisticsTabsExist();
 
             // Don't start a session until first question is answered
             sessionStats.startTime = null;
@@ -3114,81 +3116,103 @@
         }
         
         // Tab switching
+        // Updated switchTab function with better error handling for mobile
         function switchTab(tabName) {
-            // Hide all tab content
-            document.getElementById('question-card').style.display = 'none';
-            document.getElementById('completed-section').style.display = 'none';
-            document.getElementById('review-content').style.display = 'none';
-            document.getElementById('bookmarks-content').style.display = 'none';
-            document.getElementById('settings-content').style.display = 'none';
-            document.getElementById('statistics-content').style.display = 'none';
-            document.getElementById('main-controls').style.display = 'none';
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remove active class from all mobile tabs
-            document.querySelectorAll('.mobile-nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Set active tab
-            if (tabName === 'stats') {
-                document.getElementById('stats-tab').classList.add('active');
-                const mobileStatsTab = document.getElementById('mobile-stats-tab');
-                if (mobileStatsTab) {
-                    mobileStatsTab.classList.add('active');
+            try {
+                // Ensure the statistics tab exists before switching to it
+                if (tabName === 'stats') {
+                    ensureStatisticsTabsExist();
                 }
                 
-                // Update statistics UI before showing
-                updateStatisticsUI();
-                document.getElementById('statistics-content').style.display = 'block';
+                // Hide all tab content with error handling
+                const tabElements = [
+                    'question-card', 'completed-section', 'review-content', 
+                    'bookmarks-content', 'settings-content', 'statistics-content', 'main-controls'
+                ];
                 
-            } else {
-                // Set the normal tab as active
-                const tab = document.getElementById(`${tabName}-tab`);
-                if (tab) {
-                    tab.classList.add('active');
-                }
-                
-                // Set active mobile tab
-                const mobileTab = document.getElementById(`mobile-${tabName}-tab`);
-                if (mobileTab) {
-                    mobileTab.classList.add('active');
-                }
-                
-                // Show selected tab content
-                if (tabName === 'quiz') {
-                    // If we're in the quiz and not complete, show the question card
-                    if (currentIndex < questions.length && elements.questionCard) {
-                        elements.questionCard.style.display = 'block';
+                tabElements.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.style.display = 'none';
                     }
-                    // If we've completed the quiz, show completion screen
-                    else if (elements.completedSection) {
-                        elements.completedSection.style.display = 'block';
+                });
+                
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Remove active class from all mobile tabs
+                document.querySelectorAll('.mobile-nav-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Set active tab
+                if (tabName === 'stats') {
+                    const statsTab = document.getElementById('stats-tab');
+                    if (statsTab) statsTab.classList.add('active');
+                    
+                    const mobileStatsTab = document.getElementById('mobile-stats-tab');
+                    if (mobileStatsTab) mobileStatsTab.classList.add('active');
+                    
+                    // Update statistics UI before showing
+                    updateStatisticsUI();
+                    
+                    const statsContent = document.getElementById('statistics-content');
+                    if (statsContent) statsContent.style.display = 'block';
+                } else {
+                    // Set the normal tab as active
+                    const tab = document.getElementById(`${tabName}-tab`);
+                    if (tab) {
+                        tab.classList.add('active');
                     }
                     
-                    // Show main controls in quiz mode on desktop
-                    if (elements.mainControls && !isMobile()) {
-                        elements.mainControls.style.display = 'flex';
+                    // Set active mobile tab
+                    const mobileTab = document.getElementById(`mobile-${tabName}-tab`);
+                    if (mobileTab) {
+                        mobileTab.classList.add('active');
                     }
-                } 
-                else if (tabName === 'review') {
-                    document.getElementById('review-content').style.display = 'block';
-                    updateReviewUI();
+                    
+                    // Show selected tab content
+                    if (tabName === 'quiz') {
+                        // If we're in the quiz and not complete, show the question card
+                        if (currentIndex < questions.length && elements.questionCard) {
+                            elements.questionCard.style.display = 'block';
+                        }
+                        // If we've completed the quiz, show completion screen
+                        else if (elements.completedSection) {
+                            elements.completedSection.style.display = 'block';
+                        }
+                        
+                        // Show main controls in quiz mode on desktop
+                        if (elements.mainControls && !isMobile()) {
+                            elements.mainControls.style.display = 'flex';
+                        }
+                    } 
+                    else if (tabName === 'review') {
+                        const reviewContent = document.getElementById('review-content');
+                        if (reviewContent) reviewContent.style.display = 'block';
+                        updateReviewUI();
+                    }
+                    else if (tabName === 'bookmarks') {
+                        const bookmarksContent = document.getElementById('bookmarks-content');
+                        if (bookmarksContent) bookmarksContent.style.display = 'block';
+                        updateBookmarksUI();
+                    }
+                    else if (tabName === 'settings') {
+                        const settingsContent = document.getElementById('settings-content');
+                        if (settingsContent) settingsContent.style.display = 'block';
+                    }
                 }
-                else if (tabName === 'bookmarks') {
-                    document.getElementById('bookmarks-content').style.display = 'block';
-                    updateBookmarksUI();
-                }
-                else if (tabName === 'settings') {
-                    document.getElementById('settings-content').style.display = 'block';
-                }
+                
+                currentTab = tabName;
+            } catch (e) {
+                console.error('Error switching tabs:', e);
+                // Fallback to quiz tab in case of errors
+                currentTab = 'quiz';
+                const quizCard = document.getElementById('question-card');
+                if (quizCard) quizCard.style.display = 'block';
             }
-            
-            currentTab = tabName;
         }
         
         // Data functions
@@ -3574,6 +3598,9 @@
                 
                 // Make review list height fit properly on mobile
                 optimizeListHeights();
+                
+                // Ensure statistics tabs exist on mobile
+                ensureStatisticsTabsExist();
             }
         }
         
@@ -3756,22 +3783,40 @@
             `).join('');
         }
 
-        // Update statistics UI
+        // More robust update for statistics UI
         function updateStatisticsUI() {
-            const statisticsContent = document.getElementById('statistics-content');
-            if (statisticsContent) {
-                statisticsContent.innerHTML = createStatisticsUI();
-                
-                // Add back button event listener
-                const backBtn = document.getElementById('statistics-back-btn');
-                if (backBtn) {
-                    backBtn.addEventListener('click', () => switchTab('quiz'));
+            try {
+                const statisticsContent = document.getElementById('statistics-content');
+                if (statisticsContent) {
+                    statisticsContent.innerHTML = createStatisticsUI();
+                    
+                    // Add back button event listener
+                    const backBtn = document.getElementById('statistics-back-btn');
+                    if (backBtn) {
+                        backBtn.addEventListener('click', () => switchTab('quiz'));
+                    }
+                    
+                    // Add clear statistics button event listener
+                    const clearBtn = document.getElementById('clear-statistics-btn');
+                    if (clearBtn) {
+                        clearBtn.addEventListener('click', clearStatistics);
+                    }
                 }
+            } catch (e) {
+                console.error('Error updating statistics UI:', e);
                 
-                // Add clear statistics button event listener
-                const clearBtn = document.getElementById('clear-statistics-btn');
-                if (clearBtn) {
-                    clearBtn.addEventListener('click', clearStatistics);
+                // Fallback content
+                const statisticsContent = document.getElementById('statistics-content');
+                if (statisticsContent) {
+                    statisticsContent.innerHTML = `
+                        <div class="error-state" style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: #f72585;"></i>
+                            <p style="margin-top: 20px;">There was a problem loading statistics.</p>
+                            <button class="btn btn-primary" onclick="switchTab('quiz')">
+                                Back to Quiz
+                            </button>
+                        </div>
+                    `;
                 }
             }
         }
@@ -4030,7 +4075,140 @@
             `;
             
             document.head.appendChild(styleElement);
-        } 
+        }
+
+        // Add this helper function to safely handle localStorage operations
+        function safeLocalStorage(operation, key, data) {
+            try {
+                if (typeof localStorage === 'undefined') {
+                    console.warn('localStorage is not available');
+                    return operation === 'get' ? null : false;
+                }
+                
+                if (operation === 'get') {
+                    return localStorage.getItem(key);
+                } else if (operation === 'set') {
+                    localStorage.setItem(key, data);
+                    return true;
+                } else if (operation === 'remove') {
+                    localStorage.removeItem(key);
+                    return true;
+                }
+            } catch (e) {
+                console.error(`localStorage ${operation} operation failed:`, e);
+                
+                // Check for specific Safari private browsing error
+                if (e.name === 'QuotaExceededError' || 
+                    e.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+                    e.code === 22 ||
+                    e.code === 1014) {
+                    console.warn('This appears to be Safari in private browsing mode or with storage restrictions');
+                }
+                
+                return operation === 'get' ? null : false;
+            }
+        }
+
+        // Function to ensure statistics tabs exist
+        function ensureStatisticsTabsExist() {
+            // Create desktop tab if it doesn't exist
+            if (!document.getElementById('stats-tab')) {
+                const tabContainer = document.querySelector('.tab-container');
+                if (tabContainer) {
+                    const statsTab = document.createElement('div');
+                    statsTab.className = 'tab';
+                    statsTab.id = 'stats-tab';
+                    statsTab.innerHTML = '<i class="fas fa-chart-bar"></i> Stats';
+                    statsTab.addEventListener('click', () => switchTab('stats'));
+                    tabContainer.appendChild(statsTab);
+                }
+            }
+            
+            // Create mobile tab if it doesn't exist
+            if (!document.getElementById('mobile-stats-tab')) {
+                const mobileNavTabs = document.querySelector('.mobile-nav-tabs');
+                if (mobileNavTabs) {
+                    const mobileStatsTab = document.createElement('div');
+                    mobileStatsTab.className = 'mobile-nav-tab';
+                    mobileStatsTab.id = 'mobile-stats-tab';
+                    mobileStatsTab.innerHTML = '<i class="fas fa-chart-bar"></i>Stats';
+                    mobileStatsTab.addEventListener('click', () => switchTab('stats'));
+                    mobileNavTabs.appendChild(mobileStatsTab);
+                }
+            }
+            
+            // Create statistics content container if it doesn't exist
+            if (!document.getElementById('statistics-content')) {
+                const mainElement = document.getElementById('quiz-container');
+                if (mainElement) {
+                    const statsContent = document.createElement('div');
+                    statsContent.id = 'statistics-content';
+                    statsContent.className = 'statistics-panel';
+                    statsContent.style.display = 'none';
+                    mainElement.appendChild(statsContent);
+                    
+                    // Initialize the content
+                    updateStatisticsUI();
+                }
+            }
+        }
+        
+        // Add specific Safari mobile compatibility styles
+        function addMobileSafariStyles() {
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            if (isSafari || isIOS) {
+                console.log('Safari/iOS detected, adding compatibility styles');
+                
+                const styleElement = document.createElement('style');
+                styleElement.id = 'safari-compatibility-styles';
+                styleElement.textContent = `
+                    /* Fix for Safari scrolling issues */
+                    .sessions-history, .most-missed-section {
+                        -webkit-overflow-scrolling: touch;
+                    }
+                    
+                    .sessions-table {
+                        width: 100%;
+                        max-width: 100%;
+                        display: block;
+                    }
+                    
+                    /* Ensure table cells don't overflow on small screens */
+                    .sessions-table td {
+                        max-width: 80px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    
+                    /* Fix for Safari flex issues */
+                    .statistics-summary, .statistics-time {
+                        display: -webkit-box;
+                        display: -webkit-flex;
+                        display: flex;
+                        -webkit-flex-wrap: wrap;
+                        flex-wrap: wrap;
+                    }
+                    
+                    /* Ensure the statistics panel itself scrolls properly */
+                    .statistics-panel {
+                        overflow-y: auto;
+                        -webkit-overflow-scrolling: touch;
+                        max-height: 85vh; /* Ensure it doesn't overflow screen */
+                    }
+                    
+                    /* Fix potential button and interactive element issues */
+                    .btn, .mobile-nav-tab, .tab {
+                        cursor: pointer;
+                        -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+                    }
+                `;
+                
+                document.head.appendChild(styleElement);
+            }
+        }
     </script>
 </body>
 </html>
