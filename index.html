@@ -94,6 +94,58 @@
             transition: width 0.5s ease;
         }
 
+        /* First, let's reset the original explanation styles completely */
+        .explanation {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 20px 0 !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+        }
+
+        /* Remove any border-left that might be causing the blue line */
+        .explanation::before,
+        .explanation::after {
+            display: none !important;
+        }
+
+        /* Keep our unified card design */
+        .unified-explanation {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            background: #2c2c2c;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 0;
+        }
+
+        .chapter-header {
+            background: #4361ee;
+            color: white;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .chapter-number {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            padding: 2px 7px;
+            margin-right: 10px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .explanation-content {
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
         .tab-container {
             display: flex;
             background: var(--primary);
@@ -3310,7 +3362,40 @@
             }
             
             // Always show explanation regardless of correct/incorrect
-            elements.explanation.innerText = currentQuestion.explanation;
+            if (currentQuestion.chapter) {
+                // Parse chapter information
+                let chapterNumber = '';
+                let chapterTitle = currentQuestion.chapter;
+                
+                // Check if it follows the pattern "CODE - TITLE"
+                if (currentQuestion.chapter.includes(' - ')) {
+                    const parts = currentQuestion.chapter.split(' - ', 2);
+                    chapterNumber = parts[0].trim();
+                    chapterTitle = parts[1].trim();
+                }
+                
+                // Create a completely unified design
+                elements.explanation.innerHTML = `
+                    <div class="unified-explanation">
+                        <div class="chapter-header">
+                            <span class="chapter-number">${chapterNumber}</span>
+                            <span>${chapterTitle}</span>
+                        </div>
+                        <div class="explanation-content">
+                            ${currentQuestion.explanation}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Simple version for questions without chapters
+                elements.explanation.innerHTML = `
+                    <div class="unified-explanation">
+                        <div class="explanation-content">
+                            ${currentQuestion.explanation}
+                        </div>
+                    </div>
+                `;
+            }
             elements.explanation.style.display = 'block';
             
             // Show feedback and continue button
