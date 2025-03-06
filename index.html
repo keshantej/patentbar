@@ -1225,6 +1225,9 @@
             <div class="tab" id="settings-tab">
                 <i class="fas fa-cog"></i> Settings
             </div>
+            <div class="tab" id="stats-tab">
+                <i class="fas fa-chart-bar"></i> Stats
+            </div>
         </div>
         
         <div class="main" id="quiz-container">
@@ -1502,6 +1505,10 @@
                 <i class="fas fa-cog"></i>
                 Settings
             </div>
+            <div class="mobile-nav-tab" id="mobile-stats-tab">
+                <i class="fas fa-chart-bar"></i>
+                Stats
+            </div>            
         </div>
     </div>
     
@@ -1617,20 +1624,38 @@
 
         // Save statistics data
         function saveStatistics() {
-            safeLocalStorage('set', 'truefalse_global_stats', JSON.stringify(globalStats));
-        }
-        function updateSessionStats(isCorrect) {
-            // Make sure we have an active session
-            if (!sessionStats.startTime) {
-                startSession();
-            }
+            console.log('Attempting to save statistics:', globalStats);
             
-            sessionStats.questionsAnswered++;
-            
-            if (isCorrect) {
-                sessionStats.correctAnswers++;
-            } else {
-                sessionStats.wrongAnswers++;
+            try {
+                // First, try using safeLocalStorage
+                const saved = safeLocalStorage('set', 'truefalse_global_stats', JSON.stringify(globalStats));
+                
+                // If that fails, try direct localStorage as fallback
+                if (!saved) {
+                    console.log('Safe storage failed, trying direct localStorage');
+                    localStorage.setItem('truefalse_global_stats', JSON.stringify(globalStats));
+                }
+                
+                console.log('Statistics saved successfully');
+                return true;
+            } catch (e) {
+                console.error('Failed to save statistics:', e);
+                
+                // Try one more approach - simplified data
+                try {
+                    // Create a simplified version without session history if it's large
+                    const simplifiedStats = {...globalStats};
+                    if (simplifiedStats.sessionsHistory && simplifiedStats.sessionsHistory.length > 5) {
+                        simplifiedStats.sessionsHistory = simplifiedStats.sessionsHistory.slice(0, 5);
+                    }
+                    
+                    localStorage.setItem('truefalse_simplified_stats', JSON.stringify(simplifiedStats));
+                    console.log('Saved simplified statistics as fallback');
+                } catch (innerError) {
+                    console.error('Even simplified statistics save failed:', innerError);
+                }
+                
+                return false;
             }
         }
         // Start tracking a new session
@@ -1645,9 +1670,29 @@
             };
         }
 
+        // Update session stats when answering a question
+        function updateSessionStats(isCorrect) {
+            // Make sure we have an active session
+            if (!sessionStats.startTime) {
+                startSession();
+            }
+            
+            sessionStats.questionsAnswered++;
+            
+            if (isCorrect) {
+                sessionStats.correctAnswers++;
+            } else {
+                sessionStats.wrongAnswers++;
+            }
+        }
         // End and save the current session
         function endSession() {
-            if (!sessionStats.startTime) return;
+            console.log('Ending session:', sessionStats);
+            
+            if (!sessionStats.startTime) {
+                console.log('No active session to end');
+                return;
+            }
             
             // Skip recording sessions with no questions answered
             if (sessionStats.questionsAnswered === 0) {
@@ -1693,10 +1738,19 @@
                 globalStats.sessionsHistory = globalStats.sessionsHistory.slice(0, 50);
             }
             
-            // Save to localStorage
-            saveStatistics();
+            // Save to localStorage with debug info
+            const saveSuccessful = saveStatistics();
+            console.log('Session saving completed, success:', saveSuccessful);
             
-            console.log('Session saved:', sessionStats);
+            // Reset session stats to prevent double-counting
+            sessionStats = {
+                startTime: null,
+                endTime: null,
+                questionsAnswered: 0,
+                correctAnswers: 0,
+                wrongAnswers: 0,
+                accuracy: 0
+            };
         }
         
         function cleanupSessionHistory() {
@@ -1992,27 +2046,7 @@
                 }
             });
 
-            // Add statistics tab
-            const tabContainer = document.querySelector('.tab-container');
-            if (tabContainer) {
-                const statsTab = document.createElement('div');
-                statsTab.className = 'tab';
-                statsTab.id = 'stats-tab';
-                statsTab.innerHTML = '<i class="fas fa-chart-bar"></i> Stats';
-                statsTab.addEventListener('click', () => switchTab('stats'));
-                tabContainer.appendChild(statsTab);
-            }
-
-            // Add mobile stats tab
-            const mobileNavTabs = document.querySelector('.mobile-nav-tabs');
-            if (mobileNavTabs) {
-                const mobileStatsTab = document.createElement('div');
-                mobileStatsTab.className = 'mobile-nav-tab';
-                mobileStatsTab.id = 'mobile-stats-tab';
-                mobileStatsTab.innerHTML = '<i class="fas fa-chart-bar"></i>Stats';
-                mobileStatsTab.addEventListener('click', () => switchTab('stats'));
-                mobileNavTabs.appendChild(mobileStatsTab);
-            }
+            
 
             // Create statistics container
             const mainElement = document.getElementById('quiz-container');
@@ -3119,6 +3153,41 @@
         // Updated switchTab function with better error handling for mobile
         function switchTab(tabName) {
             try {
+                // When switching to the stats tab, add this at the beginning of your switchTab function:
+                if (tabName === 'stats') {
+                    // End current session to save stats before viewing them
+                    if (sessionStats.questionsAnswered > 0) {
+                        endSession();
+                        startSession(); // Start a new session for after
+                    }
+                    
+                    // Fix duplicate tabs if they exist
+                    const mobileNavTabs = document.querySelector('.mobile-nav-tabs');
+                    if (mobileNavTabs) {
+                        const statsTabs = Array.from(mobileNavTabs.querySelectorAll('.mobile-nav-tab'))
+                            .filter(tab => tab.innerHTML.includes('fa-chart-bar'));
+                        
+                        if (statsTabs.length > 1) {
+                            console.log('Found duplicate stats tabs, removing extras');
+                            // Keep only the first one with ID or first one overall
+                            const firstWithId = statsTabs.find(tab => tab.id === 'mobile-stats-tab');
+                            const keepTab = firstWithId || statsTabs[0];
+                            
+                            if (keepTab) {
+                                // Make sure it has an ID
+                                keepTab.id = 'mobile-stats-tab';
+                                
+                                // Remove all others
+                                statsTabs.forEach(tab => {
+                                    if (tab !== keepTab) {
+                                        tab.remove();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+
                 // Ensure the statistics tab exists before switching to it
                 if (tabName === 'stats') {
                     ensureStatisticsTabsExist();
@@ -4111,33 +4180,7 @@
 
         // Function to ensure statistics tabs exist
         function ensureStatisticsTabsExist() {
-            // Create desktop tab if it doesn't exist
-            if (!document.getElementById('stats-tab')) {
-                const tabContainer = document.querySelector('.tab-container');
-                if (tabContainer) {
-                    const statsTab = document.createElement('div');
-                    statsTab.className = 'tab';
-                    statsTab.id = 'stats-tab';
-                    statsTab.innerHTML = '<i class="fas fa-chart-bar"></i> Stats';
-                    statsTab.addEventListener('click', () => switchTab('stats'));
-                    tabContainer.appendChild(statsTab);
-                }
-            }
-            
-            // Create mobile tab if it doesn't exist
-            if (!document.getElementById('mobile-stats-tab')) {
-                const mobileNavTabs = document.querySelector('.mobile-nav-tabs');
-                if (mobileNavTabs) {
-                    const mobileStatsTab = document.createElement('div');
-                    mobileStatsTab.className = 'mobile-nav-tab';
-                    mobileStatsTab.id = 'mobile-stats-tab';
-                    mobileStatsTab.innerHTML = '<i class="fas fa-chart-bar"></i>Stats';
-                    mobileStatsTab.addEventListener('click', () => switchTab('stats'));
-                    mobileNavTabs.appendChild(mobileStatsTab);
-                }
-            }
-            
-            // Create statistics content container if it doesn't exist
+            // Just create the statistics content container if it doesn't exist
             if (!document.getElementById('statistics-content')) {
                 const mainElement = document.getElementById('quiz-container');
                 if (mainElement) {
@@ -4146,10 +4189,24 @@
                     statsContent.className = 'statistics-panel';
                     statsContent.style.display = 'none';
                     mainElement.appendChild(statsContent);
-                    
-                    // Initialize the content
-                    updateStatisticsUI();
                 }
+            }
+            
+            // Make sure the tabs have event listeners
+            const statsTab = document.getElementById('stats-tab');
+            if (statsTab) {
+                // Remove any existing click listeners to prevent duplicates
+                const newStatsTab = statsTab.cloneNode(true);
+                statsTab.parentNode.replaceChild(newStatsTab, statsTab);
+                newStatsTab.addEventListener('click', () => switchTab('stats'));
+            }
+            
+            const mobileStatsTab = document.getElementById('mobile-stats-tab');
+            if (mobileStatsTab) {
+                // Remove any existing click listeners to prevent duplicates
+                const newMobileStatsTab = mobileStatsTab.cloneNode(true);
+                mobileStatsTab.parentNode.replaceChild(newMobileStatsTab, mobileStatsTab);
+                newMobileStatsTab.addEventListener('click', () => switchTab('stats'));
             }
         }
         
@@ -4209,6 +4266,40 @@
                 document.head.appendChild(styleElement);
             }
         }
+
+        // Handle visibility changes (mobile browsers often use this when app is switched)
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                console.log('App hidden, saving session data');
+                endSession();
+                saveQuestionData();
+            }
+        });
+
+        // Set up periodic saving specifically for iOS Safari
+        function setupIOSSafariPeriodicSave() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            
+            if (isIOS || isSafari) {
+                console.log('iOS Safari detected, setting up periodic save');
+                
+                // Save every 30 seconds to ensure data isn't lost
+                setInterval(function() {
+                    if (sessionStats.questionsAnswered > 0) {
+                        console.log('Periodic save triggered');
+                        // Save current statistics without ending the session
+                        saveStatistics();
+                        saveQuestionData();
+                    }
+                }, 30000); // Every 30 seconds
+            }
+        }
+
+        // Call the setup function on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setupIOSSafariPeriodicSave();
+        });
     </script>
 </body>
 </html>
