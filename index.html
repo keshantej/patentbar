@@ -1174,6 +1174,284 @@
         * {
             -webkit-tap-highlight-color: rgba(67, 97, 238, 0.2);
         }
+        /* Chapter styles - Add these to your style section */
+        .chapters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chapters-header h3 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        body.dark-mode .chapters-header h3 {
+            color: var(--success);
+        }
+
+        .chapters-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chapters-list {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        body.dark-mode .chapters-list {
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        body.dark-mode .chapter-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chapter-item:last-child {
+            border-bottom: none;
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        body.dark-mode .chapter-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .chapter-item.selected {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        body.dark-mode .chapter-item.selected {
+            background-color: rgba(76, 201, 240, 0.1);
+        }
+
+        .chapter-checkbox {
+            margin-right: 15px;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        body.dark-mode .chapter-checkbox {
+            color: var(--success);
+        }
+
+        .chapter-info {
+            flex-grow: 1;
+        }
+
+        .chapter-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .chapter-count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        body.dark-mode .chapter-count {
+            color: #aaa;
+        }
+
+        .chapters-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .chapters-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        body.dark-mode .chapters-empty {
+            color: #aaa;
+        }
+
+        .chapters-empty i {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .chapters-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .chapters-actions {
+                width: 100%;
+            }
+            
+            .chapters-actions .btn {
+                flex: 1;
+                padding: 8px;
+                font-size: 14px;
+            }
+            
+            .chapters-list {
+                max-height: calc(100vh - 250px);
+            }
+        }
+        /* Chapter styles */
+        .chapters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chapters-header h3 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        body.dark-mode .chapters-header h3 {
+            color: var(--success);
+        }
+
+        .chapters-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chapters-list {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        body.dark-mode .chapters-list {
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        body.dark-mode .chapter-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chapter-item:last-child {
+            border-bottom: none;
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        body.dark-mode .chapter-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .chapter-item.selected {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        body.dark-mode .chapter-item.selected {
+            background-color: rgba(76, 201, 240, 0.1);
+        }
+
+        .chapter-checkbox {
+            margin-right: 15px;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        body.dark-mode .chapter-checkbox {
+            color: var(--success);
+        }
+
+        .chapter-info {
+            flex-grow: 1;
+        }
+
+        .chapter-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .chapter-count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        body.dark-mode .chapter-count {
+            color: #aaa;
+        }
+
+        .chapters-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .chapters-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        body.dark-mode .chapters-empty {
+            color: #aaa;
+        }
+
+        .chapters-empty i {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .chapters-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .chapters-actions {
+                width: 100%;
+            }
+            
+            .chapters-actions .btn {
+                flex: 1;
+                padding: 8px;
+                font-size: 14px;
+            }
+            
+            .chapters-list {
+                max-height: calc(100vh - 250px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1201,7 +1479,7 @@
 
     <div class="app-container">
         <div class="header">
-            <h1>True/False Study Quiz</h1>
+            <h1>True or False?</h1>
             <p id="question-status">Question 0 of 0</p>
             <div class="progress-container">
                 <div class="progress-bar" id="progress-bar"></div>
@@ -1219,8 +1497,8 @@
                 <i class="fas fa-history"></i> Review
                 <span class="tab-badge" id="review-count">0</span>
             </div>
-            <div class="tab" id="bookmarks-tab">
-                <i class="fas fa-bookmark"></i> Bookmarks
+            <div class="tab" id="chapters-tab">
+                <i class="fas fa-book"></i> Chapters
             </div>
             <div class="tab" id="settings-tab">
                 <i class="fas fa-cog"></i> Settings
@@ -1317,6 +1595,42 @@
                 </div>
             </div>
             
+            <!-- Chapters Tab Content -->
+            <div id="chapters-content" style="display: none; width: 100%;">
+                <button class="mobile-back-btn" id="chapters-back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Quiz
+                </button>
+                
+                <div class="chapters-header">
+                    <h3>Select Chapters to Study</h3>
+                    <div class="chapters-actions">
+                        <button class="btn btn-secondary" id="select-all-chapters">
+                            <i class="fas fa-check-square"></i> Select All
+                        </button>
+                        <button class="btn btn-secondary" id="deselect-all-chapters">
+                            <i class="fas fa-square"></i> Deselect All
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chapters-list" id="chapters-list">
+                    <!-- Chapter items will be added here dynamically -->
+                </div>
+                
+                <div class="chapters-empty" id="chapters-empty" style="display: none;">
+                    <i class="fas fa-book"></i>
+                    <p>No chapters found!</p>
+                    <p>Make sure your CSV file contains a chapter column.</p>
+                </div>
+                
+                <div class="chapters-footer">
+                    <button class="btn btn-primary" id="apply-chapters-btn">
+                        <i class="fas fa-play"></i> Apply & Start Quiz
+                    </button>
+                </div>
+            </div>
+
+
             <!-- Bookmarks Tab Content -->
             <div id="bookmarks-content" style="display: none; width: 100%;">
                 <button class="mobile-back-btn" id="bookmarks-back-btn">
@@ -1497,9 +1811,9 @@
                 Review
                 <span class="mobile-nav-badge" id="mobile-review-count">0</span>
             </div>
-            <div class="mobile-nav-tab" id="mobile-bookmarks-tab">
-                <i class="fas fa-bookmark"></i>
-                Saved
+            <div class="mobile-nav-tab" id="mobile-chapters-tab">
+                <i class="fas fa-book"></i>
+                Chapters
             </div>
             <div class="mobile-nav-tab" id="mobile-settings-tab">
                 <i class="fas fa-cog"></i>
@@ -1554,7 +1868,8 @@
             wrongAnswers: 0,
             accuracy: 0
         };
-
+        let chapterData = {};  // Will contain chapter information: { chapterName: { count: X, questions: [...] } }
+        let selectedChapters = {}; // Will track which chapters are selected
         let globalStats = {
             totalQuestionsAnswered: 0,
             totalCorrectAnswers: 0,
@@ -1849,13 +2164,13 @@
             // Tab elements
             quizTab: document.getElementById('quiz-tab'),
             reviewTab: document.getElementById('review-tab'),
-            bookmarksTab: document.getElementById('bookmarks-tab'),
+            chaptersTab: document.getElementById('chapters-tab'), // Changed from bookmarksTab
             settingsTab: document.getElementById('settings-tab'),
             
             // Mobile tab elements
             mobileQuizTab: document.getElementById('mobile-quiz-tab'),
             mobileReviewTab: document.getElementById('mobile-review-tab'),
-            mobileBookmarksTab: document.getElementById('mobile-bookmarks-tab'),
+            mobileChaptersTab: document.getElementById('mobile-chapters-tab'), // Changed from mobileBookmarksTab
             mobileSettingsTab: document.getElementById('mobile-settings-tab'),
             
             // More button elements
@@ -1880,140 +2195,101 @@
             
             // Back buttons
             reviewBackBtn: document.getElementById('review-back-btn'),
-            bookmarksBackBtn: document.getElementById('bookmarks-back-btn'),
+            chaptersBackBtn: document.getElementById('chapters-back-btn'), // Changed from bookmarksBackBtn
             settingsBackBtn: document.getElementById('settings-back-btn'),
             
             // Help modal
-            mobileHelpClose: document.getElementById('mobile-help-close')
+            mobileHelpClose: document.getElementById('mobile-help-close'),
+            
+            // Chapter-specific elements
+            chaptersList: document.getElementById('chapters-list'),
+            chaptersEmpty: document.getElementById('chapters-empty'),
+            selectAllChapters: document.getElementById('select-all-chapters'),
+            deselectAllChapters: document.getElementById('deselect-all-chapters'),
+            applyChaptersBtn: document.getElementById('apply-chapters-btn')
         };
         
         // Event listeners for all buttons and tabs
         document.addEventListener('DOMContentLoaded', function() {
             // Tab navigation
-            elements.quizTab.addEventListener('click', () => switchTab('quiz'));
-            elements.reviewTab.addEventListener('click', () => switchTab('review'));
-            elements.bookmarksTab.addEventListener('click', () => switchTab('bookmarks'));
-            elements.settingsTab.addEventListener('click', () => switchTab('settings'));
+            addSafeEventListener('quiz-tab', 'click', () => switchTab('quiz'));
+            addSafeEventListener('review-tab', 'click', () => switchTab('review'));
+            addSafeEventListener('chapters-tab', 'click', () => switchTab('chapters'));
+            addSafeEventListener('settings-tab', 'click', () => switchTab('settings'));
+            addSafeEventListener('stats-tab', 'click', () => switchTab('stats'));
             
             // Mobile tab navigation
-            elements.mobileQuizTab.addEventListener('click', () => switchTab('quiz'));
-            elements.mobileReviewTab.addEventListener('click', () => switchTab('review'));
-            elements.mobileBookmarksTab.addEventListener('click', () => switchTab('bookmarks'));
-            elements.mobileSettingsTab.addEventListener('click', () => switchTab('settings'));
+            addSafeEventListener('mobile-quiz-tab', 'click', () => switchTab('quiz'));
+            addSafeEventListener('mobile-review-tab', 'click', () => switchTab('review'));
+            addSafeEventListener('mobile-chapters-tab', 'click', () => switchTab('chapters'));
+            addSafeEventListener('mobile-settings-tab', 'click', () => switchTab('settings'));
+            addSafeEventListener('mobile-stats-tab', 'click', () => switchTab('stats'));
             
             // Answer buttons
-            elements.trueBtn.addEventListener('click', () => checkAnswer('True'));
-            elements.falseBtn.addEventListener('click', () => checkAnswer('False'));
+            addSafeEventListener('true-btn', 'click', () => checkAnswer('True'));
+            addSafeEventListener('false-btn', 'click', () => checkAnswer('False'));
             
             // Continue button
-            elements.continueBtn.addEventListener('click', loadNextQuestion);
+            addSafeEventListener('continue-btn', 'click', loadNextQuestion);
             
             // Reset buttons
-            elements.resetBtn.addEventListener('click', resetQuiz);
-            elements.mainResetBtn.addEventListener('click', resetQuiz);
+            addSafeEventListener('reset-btn', 'click', resetQuiz);
+            addSafeEventListener('main-reset-btn', 'click', resetQuiz);
             
             // Review wrong answers button
-            elements.reviewWrongBtn.addEventListener('click', () => switchTab('review'));
+            addSafeEventListener('review-wrong-btn', 'click', () => switchTab('review'));
             
             // Practice buttons
-            elements.practiceWrongBtn.addEventListener('click', practiceWrongAnswers);
-            elements.desktopPracticeWrongBtn.addEventListener('click', practiceWrongAnswers);
-            elements.practiceBookmarksBtn.addEventListener('click', practiceBookmarks);
-            elements.desktopPracticeBookmarksBtn.addEventListener('click', practiceBookmarks);
+            addSafeEventListener('practice-wrong-btn', 'click', practiceWrongAnswers);
+            addSafeEventListener('desktop-practice-wrong-btn', 'click', practiceWrongAnswers);
             
             // Clear buttons
-            elements.clearWrongBtn.addEventListener('click', clearWrongAnswers);
-            elements.desktopClearWrongBtn.addEventListener('click', clearWrongAnswers);
-            elements.clearBookmarksBtn.addEventListener('click', clearBookmarks);
-            elements.desktopClearBookmarksBtn.addEventListener('click', clearBookmarks);
+            addSafeEventListener('clear-wrong-btn', 'click', clearWrongAnswers);
+            addSafeEventListener('desktop-clear-wrong-btn', 'click', clearWrongAnswers);
             
             // Reset all data button
-            elements.resetAllBtn.addEventListener('click', resetAllData);
+            addSafeEventListener('reset-all-btn', 'click', resetAllData);
             
             // Bookmark button
-            elements.bookmarkBtn.addEventListener('click', toggleBookmark);
+            addSafeEventListener('bookmark-btn', 'click', toggleBookmark);
             
             // Filter buttons
-            elements.filterAll.addEventListener('click', () => filterReviewItems('all'));
-            elements.filterRecent.addEventListener('click', () => filterReviewItems('recent'));
-            elements.filterMostMissed.addEventListener('click', () => filterReviewItems('most-missed'));
+            addSafeEventListener('filter-all', 'click', () => filterReviewItems('all'));
+            addSafeEventListener('filter-recent', 'click', () => filterReviewItems('recent'));
+            addSafeEventListener('filter-most-missed', 'click', () => filterReviewItems('most-missed'));
             
             // Back buttons
-            elements.reviewBackBtn.addEventListener('click', () => switchTab('quiz'));
-            elements.bookmarksBackBtn.addEventListener('click', () => switchTab('quiz'));
-            elements.settingsBackBtn.addEventListener('click', () => switchTab('quiz'));
+            addSafeEventListener('review-back-btn', 'click', () => switchTab('quiz'));
+            addSafeEventListener('chapters-back-btn', 'click', () => switchTab('quiz'));
+            addSafeEventListener('settings-back-btn', 'click', () => switchTab('quiz'));
             
             // Toggle switches
-            elements.shuffleToggle.addEventListener('change', toggleShuffle);
-            elements.repeatToggle.addEventListener('change', toggleRepeat);
-            elements.spacedToggle.addEventListener('change', toggleSpacedRepetition);
-            elements.timerToggle.addEventListener('change', toggleTimer);
-            elements.darkToggle.addEventListener('change', toggleDarkMode);
-            elements.saveToggle.addEventListener('change', toggleSaveProgress);
+            addSafeEventListener('shuffle-toggle', 'change', toggleShuffle);
+            addSafeEventListener('repeat-toggle', 'change', toggleRepeat);
+            addSafeEventListener('spaced-toggle', 'change', toggleSpacedRepetition);
+            addSafeEventListener('timer-toggle', 'change', toggleTimer);
+            addSafeEventListener('dark-toggle', 'change', toggleDarkMode);
+            addSafeEventListener('save-toggle', 'change', toggleSaveProgress);
             
             // Toggle buttons
-            elements.shuffleBtn.addEventListener('click', toggleShuffle);
-            elements.repeatBtn.addEventListener('click', toggleRepeat);
+            addSafeEventListener('shuffle-btn', 'click', toggleShuffle);
+            addSafeEventListener('repeat-btn', 'click', toggleRepeat);
             
             // Help modal
-            if (elements.mobileHelpClose) {
-                elements.mobileHelpClose.addEventListener('click', toggleMobileHelp);
-            }
+            addSafeEventListener('mobile-help-close', 'click', toggleMobileHelp);
+            
+            // Chapter-specific listeners
+            addSafeEventListener('select-all-chapters', 'click', selectAllChapters);
+            addSafeEventListener('deselect-all-chapters', 'click', deselectAllChapters);
+            addSafeEventListener('apply-chapters-btn', 'click', applyChaptersAndStartQuiz);
+            
+            // Rest of your existing DOMContentLoaded function...
             
             // Detect if device is touch capable
             isTouchDevice = detectTouchCapability();
             
             // Initialize mobile layout
             initMobileLayout();
-            
-            // Handle window resize events
-            window.addEventListener('resize', function() {
-                optimizeListHeights();
-                
-                // Update mobile layout class
-                if (isMobile()) {
-                    document.body.classList.add('mobile-layout');
-                    document.body.classList.add('has-mobile-nav');
-                } else {
-                    document.body.classList.remove('mobile-layout');
-                    document.body.classList.remove('has-mobile-nav');
-                }
-
-            // Update the labels for the settings panel
-            const repeatLabel = document.querySelector('.settings-row:nth-of-type(2) .settings-label span');
-            if (repeatLabel) {
-                repeatLabel.textContent = 'Endless Mode';
-            }
-
-            const repeatTooltip = document.querySelector('.settings-row:nth-of-type(2) .tooltip-text');
-            if (repeatTooltip) {
-                repeatTooltip.textContent = 'When enabled, questions can repeat before all questions are seen, creating an endless quiz';
-            }
-
-            const spacedLabel = document.querySelector('.settings-row:nth-of-type(3) .settings-label span');
-            if (spacedLabel) {
-                spacedLabel.textContent = 'Smart Repetition';
-            }
-
-            const spacedTooltip = document.querySelector('.settings-row:nth-of-type(3) .tooltip-text');
-            if (spacedTooltip) {
-                spacedTooltip.textContent = 'Shows questions you got wrong more frequently, and avoids repeating questions too soon';
-            }
-
-            // Update button text
-            const repeatBtn = document.getElementById('repeat-btn');
-            if (repeatBtn) {
-                repeatBtn.innerHTML = `<i class="fas fa-redo-alt"></i> Endless: ${repeatMode ? "ON" : "OFF"}`;
-            }
-            
-            setTimeout(updateButtonLabels, 100);
-
-            });
-            
-            // Handle orientation change events
-            window.addEventListener('orientationchange', function() {
-                setTimeout(optimizeListHeights, 300);
-            });
             
             // Load questions
             loadCSV();
@@ -2073,7 +2349,16 @@
 
             // Clean up any existing empty sessions
             cleanupSessionHistory();
-        });
+
+            // Safe event listeners for chapter functionality
+            console.log("Setting up chapters event listeners");
+            addSafeEventListener('chapters-tab', 'click', () => switchTab('chapters'));
+            addSafeEventListener('mobile-chapters-tab', 'click', () => switchTab('chapters'));
+            addSafeEventListener('chapters-back-btn', 'click', () => switchTab('quiz'));
+            addSafeEventListener('select-all-chapters', 'click', selectAllChapters);
+            addSafeEventListener('deselect-all-chapters', 'click', deselectAllChapters);
+            addSafeEventListener('apply-chapters-btn', 'click', applyChaptersAndStartQuiz);
+                    });
         
         // Load CSV file - replaced with direct sample loading for fixing the issues
         async function loadCSV() {
@@ -2112,60 +2397,389 @@
             }
         }
         
-        // Load Sample Questions
+        // Update the loadSampleQuestions function to include chapter information
         function loadSampleQuestions() {
             console.log("Loading sample questions...");
-            originalQuestions = [
-                {
-                    question: "The sky appears blue because of Rayleigh scattering of sunlight.",
-                    answer: "True",
-                    explanation: "The sky appears blue due to Rayleigh scattering of sunlight in the atmosphere. Blue light is scattered more than other colors because it travels as shorter waves."
-                },
-                {
-                    question: "Earth is the fifth planet from the sun.",
-                    answer: "False",
-                    explanation: "Earth is the third planet from the sun. The fifth planet is Jupiter."
-                },
-                {
-                    question: "DNA stands for Deoxyribonucleic Acid.",
-                    answer: "True",
-                    explanation: "DNA (Deoxyribonucleic Acid) is the genetic material that carries the instructions for development and functioning of living organisms."
-                },
-                {
-                    question: "Sound travels faster in water than in air.",
-                    answer: "True",
-                    explanation: "Sound travels about 4.3 times faster in water (1,480 m/s) than in air (343 m/s) at standard pressure and temperature."
-                },
-                {
-                    question: "The Statue of Liberty was a gift from Germany to the United States.",
-                    answer: "False",
-                    explanation: "The Statue of Liberty was a gift from France to the United States in 1886, not from Germany."
-                },
-                {
-                    question: "An atom contains a nucleus of protons and neutrons, surrounded by electrons.",
-                    answer: "True",
-                    explanation: "This is the basic structure of an atom: a nucleus containing protons and neutrons, with electrons orbiting around it."
-                },
-                {
-                    question: "Humans have 8 different blood types.",
-                    answer: "True",
-                    explanation: "Humans have 8 main blood types: A+, A-, B+, B-, AB+, AB-, O+, and O-."
-                }
-            ];
             
-            // Add unique IDs to sample questions
-            originalQuestions.forEach((q, index) => {
-                q.id = `sample-${index}`;
-            });
-            
-            // Hide loading section
-            elements.loadingSection.style.display = 'none';
-            elements.questionCard.style.display = 'block';
-            
-            // Reset and initialize with sample questions
-            resetQuiz();
+            try {
+                originalQuestions = [
+                    {
+                        question: "The sky appears blue because of Rayleigh scattering of sunlight.",
+                        answer: "True",
+                        explanation: "The sky appears blue due to Rayleigh scattering of sunlight in the atmosphere. Blue light is scattered more than other colors because it travels as shorter waves.",
+                        chapter: "Physics"
+                    },
+                    {
+                        question: "Earth is the fifth planet from the sun.",
+                        answer: "False",
+                        explanation: "Earth is the third planet from the sun. The fifth planet is Jupiter.",
+                        chapter: "Astronomy"
+                    },
+                    {
+                        question: "DNA stands for Deoxyribonucleic Acid.",
+                        answer: "True",
+                        explanation: "DNA (Deoxyribonucleic Acid) is the genetic material that carries the instructions for development and functioning of living organisms.",
+                        chapter: "Biology"
+                    },
+                    {
+                        question: "Sound travels faster in water than in air.",
+                        answer: "True",
+                        explanation: "Sound travels about 4.3 times faster in water (1,480 m/s) than in air (343 m/s) at standard pressure and temperature.",
+                        chapter: "Physics"
+                    },
+                    {
+                        question: "The Statue of Liberty was a gift from Germany to the United States.",
+                        answer: "False",
+                        explanation: "The Statue of Liberty was a gift from France to the United States in 1886, not from Germany.",
+                        chapter: "History"
+                    },
+                    {
+                        question: "An atom contains a nucleus of protons and neutrons, surrounded by electrons.",
+                        answer: "True",
+                        explanation: "This is the basic structure of an atom: a nucleus containing protons and neutrons, with electrons orbiting around it.",
+                        chapter: "Chemistry"
+                    },
+                    {
+                        question: "Humans have 8 different blood types.",
+                        answer: "True",
+                        explanation: "Humans have 8 main blood types: A+, A-, B+, B-, AB+, AB-, O+, and O-.",
+                        chapter: "Biology"
+                    }
+                ];
+                
+                // Add unique IDs to sample questions
+                originalQuestions.forEach((q, index) => {
+                    q.id = `sample-${index}`;
+                });
+                
+                // Hide loading section
+                elements.loadingSection.style.display = 'none';
+                elements.questionCard.style.display = 'block';
+                
+                // Organize questions by chapter
+                organizeChapters();
+                
+                // Reset and initialize with sample questions
+                resetQuiz();
+                
+                console.log("Sample questions loaded successfully");
+            } catch (e) {
+                console.error("Error loading sample questions:", e);
+                
+                // Fallback to minimal questions
+                originalQuestions = [
+                    {
+                        id: "sample-fallback",
+                        question: "This is a sample question. The sky is blue.",
+                        answer: "True",
+                        explanation: "This is a fallback question loaded after an error.",
+                        chapter: "General"
+                    }
+                ];
+                
+                // Try to proceed anyway
+                elements.loadingSection.style.display = 'none';
+                elements.questionCard.style.display = 'block';
+                resetQuiz();
+            }
+        }
+        // Function to organize questions by chapter
+        function organizeChapters() {
+            try {
+                console.log("Organizing questions by chapter...");
+                chapterData = {};
+                
+                // Initialize with "All Chapters" option first
+                chapterData["All Chapters"] = {
+                    count: originalQuestions.length,
+                    questions: [...originalQuestions], 
+                    selected: true  // Default selected
+                };
+                
+                // Group questions by chapter
+                originalQuestions.forEach(question => {
+                    // Handle case where chapter might be undefined
+                    const chapter = question.chapter || "Uncategorized";
+                    
+                    if (!chapterData[chapter]) {
+                        chapterData[chapter] = {
+                            count: 0,
+                            questions: [],
+                            selected: false  // Default not selected
+                        };
+                    }
+                    
+                    chapterData[chapter].count++;
+                    chapterData[chapter].questions.push(question);
+                });
+                
+                // Load previously selected chapters from localStorage if available
+                loadSelectedChapters();
+                
+                console.log("Chapters organized:", Object.keys(chapterData).length);
+                
+                return true;
+            } catch (e) {
+                console.error("Error organizing chapters:", e);
+                
+                // Fallback to ensure we have at least "All Chapters"
+                chapterData = {
+                    "All Chapters": {
+                        count: originalQuestions.length,
+                        questions: [...originalQuestions],
+                        selected: true
+                    }
+                };
+                
+                return false;
+            }
         }
 
+        // Function to load selected chapters from localStorage
+        function loadSelectedChapters() {
+            try {
+                const savedChapters = safeLocalStorage('get', 'truefalse_selected_chapters');
+                if (savedChapters) {
+                    selectedChapters = JSON.parse(savedChapters);
+                    
+                    // Update chapter data with saved selections
+                    Object.keys(chapterData).forEach(chapter => {
+                        if (selectedChapters[chapter] !== undefined) {
+                            chapterData[chapter].selected = selectedChapters[chapter];
+                        }
+                    });
+                    
+                    console.log("Loaded selected chapters:", selectedChapters);
+                } else {
+                    // Default: Only "All Chapters" is selected
+                    selectedChapters = { "All Chapters": true };
+                    Object.keys(chapterData).forEach(chapter => {
+                        if (chapter !== "All Chapters") {
+                            selectedChapters[chapter] = false;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error("Error loading selected chapters:", e);
+                // Default: Only "All Chapters" is selected
+                selectedChapters = { "All Chapters": true };
+            }
+        }
+
+        // Function to save selected chapters to localStorage
+        function saveSelectedChapters() {
+            safeLocalStorage('set', 'truefalse_selected_chapters', JSON.stringify(selectedChapters));
+        }
+
+        // Function to update chapters UI
+        function updateChaptersUI() {
+            const chaptersList = document.getElementById('chapters-list');
+            const chaptersEmpty = document.getElementById('chapters-empty');
+            
+            // Check if we have chapters
+            const chapters = Object.keys(chapterData);
+            if (chapters.length <= 1) { // Only "All Chapters" or none
+                if (chaptersEmpty) chaptersEmpty.style.display = 'block';
+                if (chaptersList) chaptersList.innerHTML = '';
+                return;
+            }
+            
+            // Generate HTML for chapter items
+            let chaptersHTML = '';
+            
+            // First add "All Chapters" option
+            if (chapterData["All Chapters"]) {
+                const isSelected = chapterData["All Chapters"].selected;
+                chaptersHTML += `
+                    <div class="chapter-item ${isSelected ? 'selected' : ''}" data-chapter="All Chapters">
+                        <div class="chapter-checkbox">
+                            <i class="fas ${isSelected ? 'fa-check-square' : 'fa-square'}"></i>
+                        </div>
+                        <div class="chapter-info">
+                            <div class="chapter-name">All Chapters</div>
+                            <div class="chapter-count">${chapterData["All Chapters"].count} questions</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Then add all other chapters sorted alphabetically
+            const sortedChapters = chapters.filter(chapter => chapter !== "All Chapters").sort();
+            
+            sortedChapters.forEach(chapter => {
+                const isSelected = chapterData[chapter].selected;
+                chaptersHTML += `
+                    <div class="chapter-item ${isSelected ? 'selected' : ''}" data-chapter="${chapter}">
+                        <div class="chapter-checkbox">
+                            <i class="fas ${isSelected ? 'fa-check-square' : 'fa-square'}"></i>
+                        </div>
+                        <div class="chapter-info">
+                            <div class="chapter-name">${chapter}</div>
+                            <div class="chapter-count">${chapterData[chapter].count} questions</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Update UI
+            if (chaptersList) {
+                chaptersList.innerHTML = chaptersHTML;
+                chaptersEmpty.style.display = 'none';
+                
+                // Add click event listeners to chapter items
+                document.querySelectorAll('.chapter-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const chapter = item.dataset.chapter;
+                        toggleChapterSelection(chapter, item);
+                    });
+                });
+            }
+        }
+
+        // Function to toggle chapter selection
+        function toggleChapterSelection(chapter, element) {
+            // Special case for "All Chapters"
+            if (chapter === "All Chapters") {
+                const isSelected = !chapterData[chapter].selected;
+                
+                // Update the selected state
+                chapterData[chapter].selected = isSelected;
+                selectedChapters[chapter] = isSelected;
+                
+                // If selecting "All Chapters", deselect all others
+                if (isSelected) {
+                    Object.keys(chapterData).forEach(ch => {
+                        if (ch !== "All Chapters") {
+                            chapterData[ch].selected = false;
+                            selectedChapters[ch] = false;
+                        }
+                    });
+                }
+            } else {
+                // Toggle this chapter's selection
+                const isSelected = !chapterData[chapter].selected;
+                chapterData[chapter].selected = isSelected;
+                selectedChapters[chapter] = isSelected;
+                
+                // If this chapter is being selected, deselect "All Chapters"
+                if (isSelected && chapterData["All Chapters"]) {
+                    chapterData["All Chapters"].selected = false;
+                    selectedChapters["All Chapters"] = false;
+                }
+                
+                // If no chapters are selected, select "All Chapters"
+                const anySelected = Object.keys(chapterData).some(ch => 
+                    ch !== "All Chapters" && chapterData[ch].selected
+                );
+                
+                if (!anySelected && chapterData["All Chapters"]) {
+                    chapterData["All Chapters"].selected = true;
+                    selectedChapters["All Chapters"] = true;
+                }
+            }
+            
+            // Save selected chapters
+            saveSelectedChapters();
+            
+            // Update UI
+            updateChaptersUI();
+        }
+
+        // Function to select all chapters
+        function selectAllChapters() {
+            Object.keys(chapterData).forEach(chapter => {
+                if (chapter !== "All Chapters") {
+                    chapterData[chapter].selected = true;
+                    selectedChapters[chapter] = true;
+                } else {
+                    chapterData[chapter].selected = false;
+                    selectedChapters[chapter] = false;
+                }
+            });
+            
+            saveSelectedChapters();
+            updateChaptersUI();
+        }
+
+        // Function to deselect all chapters
+        function deselectAllChapters() {
+            Object.keys(chapterData).forEach(chapter => {
+                if (chapter === "All Chapters") {
+                    chapterData[chapter].selected = true;
+                    selectedChapters[chapter] = true;
+                } else {
+                    chapterData[chapter].selected = false;
+                    selectedChapters[chapter] = false;
+                }
+            });
+            
+            saveSelectedChapters();
+            updateChaptersUI();
+        }
+
+        // Function to apply chapter filters and start quiz
+        function applyChaptersAndStartQuiz() {
+            // Determine which chapters are selected
+            const selectedChapterNames = Object.keys(chapterData).filter(
+                chapter => chapterData[chapter].selected
+            );
+            
+            // If "All Chapters" is selected or no chapters selected, use all questions
+            if (selectedChapterNames.includes("All Chapters") || selectedChapterNames.length === 0) {
+                questions = [...originalQuestions];
+            } else {
+                // Combine questions from all selected chapters
+                questions = [];
+                selectedChapterNames.forEach(chapter => {
+                    questions = questions.concat(chapterData[chapter].questions);
+                });
+            }
+            
+            // Apply shuffle if enabled
+            if (shuffleMode) {
+                questions = shuffleArray(questions);
+            }
+            
+            // Reset quiz state
+            currentIndex = 0;
+            correctCount = 0;
+            answeredCount = 0;
+            questionAnswered = false;
+            
+            // Reset UI
+            elements.feedback.style.opacity = '0';
+            elements.explanation.style.display = 'none';
+            elements.continueBtn.style.display = 'none';
+            elements.correctCount.innerText = '0';
+            elements.questionCount.innerText = '0';
+            elements.accuracy.innerText = '0%';
+            elements.streakCount.innerText = '0';
+            elements.progressBar.style.width = '0%';
+            
+            // Reset mobile UI
+            if (elements.mobileCorrectCount) elements.mobileCorrectCount.innerText = '0';
+            if (elements.mobileQuestionCount) elements.mobileQuestionCount.innerText = '0';
+            if (elements.mobileAccuracy) elements.mobileAccuracy.innerText = '0%';
+            if (elements.mobileStreakCount) elements.mobileStreakCount.innerText = '0';
+            if (elements.hintTapArea) elements.hintTapArea.style.display = 'none';
+            
+            // Show question card
+            elements.questionCard.style.display = 'block';
+            elements.completedSection.style.display = 'none';
+            
+            // Switch to quiz tab
+            switchTab('quiz');
+            
+            // Display first question
+            if (questions.length > 0) {
+                displayCurrentQuestion();
+            }
+            
+            // Start timer if enabled
+            if (timerMode) {
+                startTimer();
+            }
+        }
         // Parse CSV (for future use)
         function parseCSV(text) {
             console.log("Parsing CSV text:", text.slice(0, 100) + "..."); // Log first 100 chars
@@ -2186,6 +2800,7 @@
                     question: parts[0],
                     answer: parts[1],
                     explanation: parts[2] || "No explanation provided.",
+                    chapter: parts[3] || "Uncategorized", // Add chapter information
                     missCount: 0, // Track how many times this question was missed
                     lastSeen: null
                 };
@@ -2206,6 +2821,9 @@
                 setTimeout(loadSampleQuestions, 1500);
                 return;
             }
+            
+            // Organize questions by chapter before loading saved data
+            organizeChapters();
             
             // Load saved data if enabled
             loadSavedData();
@@ -2727,6 +3345,7 @@
             return ((correctCount / answeredCount) * 100).toFixed(1);
         }
 
+        // Update the resetQuiz function to respect chapter filters
         function resetQuiz() {
             // End the current session and save statistics
             endSession();
@@ -2767,8 +3386,21 @@
             elements.questionCard.style.display = 'block';
             elements.completedSection.style.display = 'none';
             
-            // Clone questions from original set
-            questions = originalQuestions.map(q => ({...q}));
+            // Apply chapter filters to determine which questions to use
+            const selectedChapterNames = Object.keys(chapterData).filter(
+                chapter => chapterData[chapter].selected
+            );
+            
+            // If "All Chapters" is selected or no chapters selected, use all questions
+            if (selectedChapterNames.includes("All Chapters") || selectedChapterNames.length === 0) {
+                questions = originalQuestions.map(q => ({...q}));
+            } else {
+                // Combine questions from all selected chapters
+                questions = [];
+                selectedChapterNames.forEach(chapter => {
+                    questions = questions.concat(chapterData[chapter].questions.map(q => ({...q})));
+                });
+            }
             
             // Apply shuffle if enabled
             if (shuffleMode) {
@@ -3153,50 +3785,10 @@
         // Updated switchTab function with better error handling for mobile
         function switchTab(tabName) {
             try {
-                // When switching to the stats tab, add this at the beginning of your switchTab function:
-                if (tabName === 'stats') {
-                    // End current session to save stats before viewing them
-                    if (sessionStats.questionsAnswered > 0) {
-                        endSession();
-                        startSession(); // Start a new session for after
-                    }
-                    
-                    // Fix duplicate tabs if they exist
-                    const mobileNavTabs = document.querySelector('.mobile-nav-tabs');
-                    if (mobileNavTabs) {
-                        const statsTabs = Array.from(mobileNavTabs.querySelectorAll('.mobile-nav-tab'))
-                            .filter(tab => tab.innerHTML.includes('fa-chart-bar'));
-                        
-                        if (statsTabs.length > 1) {
-                            console.log('Found duplicate stats tabs, removing extras');
-                            // Keep only the first one with ID or first one overall
-                            const firstWithId = statsTabs.find(tab => tab.id === 'mobile-stats-tab');
-                            const keepTab = firstWithId || statsTabs[0];
-                            
-                            if (keepTab) {
-                                // Make sure it has an ID
-                                keepTab.id = 'mobile-stats-tab';
-                                
-                                // Remove all others
-                                statsTabs.forEach(tab => {
-                                    if (tab !== keepTab) {
-                                        tab.remove();
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-
-                // Ensure the statistics tab exists before switching to it
-                if (tabName === 'stats') {
-                    ensureStatisticsTabsExist();
-                }
-                
                 // Hide all tab content with error handling
                 const tabElements = [
                     'question-card', 'completed-section', 'review-content', 
-                    'bookmarks-content', 'settings-content', 'statistics-content', 'main-controls'
+                    'chapters-content', 'settings-content', 'statistics-content', 'main-controls'
                 ];
                 
                 tabElements.forEach(id => {
@@ -3217,43 +3809,35 @@
                 });
                 
                 // Set active tab
-                if (tabName === 'stats') {
-                    const statsTab = document.getElementById('stats-tab');
-                    if (statsTab) statsTab.classList.add('active');
+                if (tabName === 'chapters') {
+                    const chaptersTab = document.getElementById('chapters-tab');
+                    if (chaptersTab) chaptersTab.classList.add('active');
                     
-                    const mobileStatsTab = document.getElementById('mobile-stats-tab');
-                    if (mobileStatsTab) mobileStatsTab.classList.add('active');
+                    const mobileChaptersTab = document.getElementById('mobile-chapters-tab');
+                    if (mobileChaptersTab) mobileChaptersTab.classList.add('active');
                     
-                    // Update statistics UI before showing
-                    updateStatisticsUI();
+                    const chaptersContent = document.getElementById('chapters-content');
+                    if (chaptersContent) chaptersContent.style.display = 'block';
                     
-                    const statsContent = document.getElementById('statistics-content');
-                    if (statsContent) statsContent.style.display = 'block';
-                } else {
-                    // Set the normal tab as active
+                    // Update chapters UI when switching to the tab
+                    updateChaptersUI();
+                }
+                else {
+                    // Handle other tabs as before
                     const tab = document.getElementById(`${tabName}-tab`);
-                    if (tab) {
-                        tab.classList.add('active');
-                    }
+                    if (tab) tab.classList.add('active');
                     
-                    // Set active mobile tab
                     const mobileTab = document.getElementById(`mobile-${tabName}-tab`);
-                    if (mobileTab) {
-                        mobileTab.classList.add('active');
-                    }
+                    if (mobileTab) mobileTab.classList.add('active');
                     
-                    // Show selected tab content
                     if (tabName === 'quiz') {
-                        // If we're in the quiz and not complete, show the question card
                         if (currentIndex < questions.length && elements.questionCard) {
                             elements.questionCard.style.display = 'block';
                         }
-                        // If we've completed the quiz, show completion screen
                         else if (elements.completedSection) {
                             elements.completedSection.style.display = 'block';
                         }
                         
-                        // Show main controls in quiz mode on desktop
                         if (elements.mainControls && !isMobile()) {
                             elements.mainControls.style.display = 'flex';
                         }
@@ -3263,14 +3847,14 @@
                         if (reviewContent) reviewContent.style.display = 'block';
                         updateReviewUI();
                     }
-                    else if (tabName === 'bookmarks') {
-                        const bookmarksContent = document.getElementById('bookmarks-content');
-                        if (bookmarksContent) bookmarksContent.style.display = 'block';
-                        updateBookmarksUI();
-                    }
                     else if (tabName === 'settings') {
                         const settingsContent = document.getElementById('settings-content');
                         if (settingsContent) settingsContent.style.display = 'block';
+                    }
+                    else if (tabName === 'stats') {
+                        const statsContent = document.getElementById('statistics-content');
+                        if (statsContent) statsContent.style.display = 'block';
+                        updateStatisticsUI();
                     }
                 }
                 
@@ -3910,6 +4494,18 @@
             }
         }
 
+
+        // Helper function to safely add event listeners
+        function addSafeEventListener(id, event, callback) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener(event, callback);
+                return true;
+            }
+            console.warn(`Element with ID '${id}' not found, skipping event listener`);
+            return false;
+        }
+
         // CSS styles for statistics
         function addStatisticsStyles() {
             const styleElement = document.createElement('style');
@@ -4292,7 +4888,7 @@
                         saveStatistics();
                         saveQuestionData();
                     }
-                }, 30000); // Every 30 seconds
+                }, 15000); // Every 15 seconds
             }
         }
 
