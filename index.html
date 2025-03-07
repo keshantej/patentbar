@@ -176,8 +176,30 @@
         .tab i {
             margin-right: 8px;
         }
+        /* Add this to your existing styles section */
+        .fa-graduation-cap {
+            color: var(--primary);
+        }
 
-        .tab-badge {
+        /* Mastery progress styles */
+        .mastery-progress {
+            display: inline-block;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        .mastery-progress.level-1 {
+            color: #ff9f1c; /* Orange for 1/3 */
+        }
+
+        .mastery-progress.level-2 {
+            color: #3a86ff; /* Blue for 2/3 */
+        }
+
+        .mastery-progress.level-3 {
+            color: #4CAF50; /* Green for 3/3 complete */
+        }
+                .tab-badge {
             background-color: var(--false);
             color: white;
             border-radius: 50%;
@@ -3133,28 +3155,28 @@
                 
                 // If spaced repetition is enabled, adjust weights
                 if (spacedRepetitionMode) {
+                    
                     // Increase weight for questions that were answered incorrectly
                     const wrongQuestion = wrongAnswers.find(q => q.id === question.id && !q.corrected);
                     if (wrongQuestion) {
                         // Weight based on miss count - questions missed more have higher probability
-                        weight += (wrongQuestion.missCount || 1) * 3;
-                    }
-                    
-                    // Give less weight to recently seen questions
-                    if (question.lastSeen) {
-                        const timeSinceLastSeen = Date.now() - new Date(question.lastSeen).getTime();
-                        const hoursSinceLastSeen = timeSinceLastSeen / (1000 * 60 * 60);
+                        weight += (wrongQuestion.missCount || 1) * 5;
                         
-                        // If seen in the last hour, reduce the weight
-                        if (hoursSinceLastSeen < 1) {
-                            weight *= 0.2; // 80% reduction for very recently seen questions
-                        } else if (hoursSinceLastSeen < 24) {
-                            weight *= 0.5; // 50% reduction for questions seen in the last day
+                        // Add additional weight based on how many times it still needs to be answered correctly
+                        const correctCount = wrongQuestion.correctCount || 0;
+                        const remainingCorrect = 3 - correctCount; // Assuming 3 correct answers are required
+                        
+                        if (remainingCorrect > 0) {
+                            // Higher weight for questions that still need more correct answers
+                            weight += remainingCorrect * 4;
+                            
+                            // If the question has been recently answered correctly but isn't fully mastered,
+                            // still keep a good weight to ensure it comes up again soon
+                            if (correctCount > 0) {
+                                weight *= 1.5;
+                            }
                         }
                     }
-                    
-                    // Ensure a minimum weight to prevent any question from being excluded entirely
-                    weight = Math.max(0.1, weight);
                 }
                 
                 // Add the question to the pool multiple times based on its weight
@@ -3224,20 +3246,42 @@
         }
         
         function prioritizeWrongAnswers() {
-            // Get the IDs of wrong answers
-            const wrongIds = wrongAnswers.map(q => q.id);
+            // Get the wrong answers data
+            const wrongData = wrongAnswers.map(q => ({
+                id: q.id,
+                missCount: q.missCount || 0,
+                correctCount: q.correctCount || 0,
+                corrected: q.corrected || false
+            }));
             
-            // Sort questions to put wrong answers first
+            // Sort questions to prioritize correctly
             questions.sort((a, b) => {
-                const aIsWrong = wrongIds.includes(a.id) ? 1 : 0;
-                const bIsWrong = wrongIds.includes(b.id) ? 1 : 0;
+                const aWrong = wrongData.find(w => w.id === a.id);
+                const bWrong = wrongData.find(w => w.id === b.id);
                 
-                // Sort by wrong status first, then by miss count
+                // First check if either is in wrong answers and not fully corrected
+                const aIsWrong = aWrong && !aWrong.corrected ? 1 : 0;
+                const bIsWrong = bWrong && !bWrong.corrected ? 1 : 0;
+                
                 if (aIsWrong !== bIsWrong) {
-                    return bIsWrong - aIsWrong;
+                    return bIsWrong - aIsWrong; // Uncorrected wrong answers first
                 }
                 
-                // Then sort by miss count (more misses come first)
+                // Both are wrong answers not fully corrected, compare mastery progress
+                if (aIsWrong && bIsWrong) {
+                    // First prioritize by remaining correct answers needed
+                    const aRemainingCorrect = 3 - (aWrong.correctCount || 0);
+                    const bRemainingCorrect = 3 - (bWrong.correctCount || 0);
+                    
+                    if (aRemainingCorrect !== bRemainingCorrect) {
+                        return bRemainingCorrect - aRemainingCorrect; // More remaining correct answers needed first
+                    }
+                    
+                    // If same mastery level, sort by miss count
+                    return (bWrong.missCount || 0) - (aWrong.missCount || 0);
+                }
+                
+                // Otherwise, sort by miss count 
                 return (b.missCount || 0) - (a.missCount || 0);
             });
         }
@@ -3368,9 +3412,20 @@
                 // If this question was previously in wrong answers, update its status
                 const wrongIndex = wrongAnswers.findIndex(q => q.id === currentQuestion.id);
                 if (wrongIndex !== -1) {
-                    // Option 2: Keep in wrong answers but mark as corrected
-                    wrongAnswers[wrongIndex].corrected = true;
-                    wrongAnswers[wrongIndex].correctedAt = new Date().toISOString();
+                    // Initialize correctCount if it doesn't exist
+                    if (wrongAnswers[wrongIndex].correctCount === undefined) {
+                        wrongAnswers[wrongIndex].correctCount = 0;
+                    }
+                    
+                    // Increment correctCount
+                    wrongAnswers[wrongIndex].correctCount++;
+                    
+                    // Require 3 correct answers before marking as fully corrected
+                    const requiredCorrectAnswers = 3;
+                    if (wrongAnswers[wrongIndex].correctCount >= requiredCorrectAnswers) {
+                        wrongAnswers[wrongIndex].corrected = true;
+                        wrongAnswers[wrongIndex].correctedAt = new Date().toISOString();
+                    }
                     
                     updateReviewUI();
                     saveWrongAnswers();
@@ -3396,11 +3451,13 @@
                 
                 // Add to wrong answers list if not already there
                 const existingWrong = wrongAnswers.find(q => q.id === currentQuestion.id);
-                
+
                 if (existingWrong) {
                     // Update existing entry
                     existingWrong.missCount = currentQuestion.missCount;
                     existingWrong.corrected = false;
+                    // Reset correctCount when answered incorrectly again
+                    existingWrong.correctCount = 0;
                     existingWrong.lastMissed = new Date().toISOString();
                 } else {
                     // Add new entry
@@ -3408,7 +3465,8 @@
                         ...currentQuestion,
                         userAnswer: userAnswer,
                         lastMissed: new Date().toISOString(),
-                        corrected: false
+                        corrected: false,
+                        correctCount: 0
                     });
                 }
                 
@@ -3753,17 +3811,24 @@
             // Generate HTML for review items
             const reviewHTML = filteredWrong.map(q => {
                 const missCount = q.missCount || 1;
+                const correctCount = q.correctCount || 0;
                 const correctedClass = q.corrected ? 'text-success' : '';
-                const correctedIcon = q.corrected ? 
-                    '<span style="color: var(--true);"><i class="fas fa-check-circle"></i> Corrected</span>' : 
-                    `<span style="color: var(--false);"><i class="fas fa-times-circle"></i> Missed ${missCount} ${missCount === 1 ? 'time' : 'times'}</span>`;
+                
+                let statusHtml = '';
+                if (q.corrected) {
+                    statusHtml = '<span style="color: var(--true);"><i class="fas fa-check-circle"></i> Fully Mastered</span>';
+                } else if (correctCount > 0) {
+                    statusHtml = `<span style="color: var(--primary);"><i class="fas fa-graduation-cap"></i> Correctly answered ${correctCount}/3 times</span>`;
+                } else {
+                    statusHtml = `<span style="color: var(--false);"><i class="fas fa-times-circle"></i> Missed ${missCount} ${missCount === 1 ? 'time' : 'times'}</span>`;
+                }
                 
                 return `
                     <div class="review-item ${correctedClass}" data-id="${q.id}">
                         <div class="review-item-question">${q.question}</div>
                         <div class="review-item-meta">
                             <div>
-                                ${correctedIcon}
+                                ${statusHtml}
                             </div>
                             <div class="review-item-answer">
                                 Correct: ${q.answer}
