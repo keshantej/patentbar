@@ -1988,6 +1988,7 @@
             accuracy: 0
         };
         let chapterData = {};  // Will contain chapter information: { chapterName: { count: X, questions: [...] } }
+        let chapterStats = {}; // Will contain chapter statistics: { chapterName: { correct: X, total: Y } }
         let selectedChapters = {}; // Will track which chapters are selected
         let globalStats = {
             totalQuestionsAnswered: 0,
@@ -2016,7 +2017,55 @@
                 console.error('Error saving question data:', e);
             }
         }
+        // Add this function to update chapter stats when a question is answered
+        function updateChapterStats(question, isCorrect) {
+            // Skip if no chapter information
+            if (!question.chapter) return;
+            
+            const chapterName = question.chapter;
+            
+            // Initialize chapter stats if not already done
+            if (!chapterStats[chapterName]) {
+                chapterStats[chapterName] = {
+                    correct: 0,
+                    total: 0,
+                    accuracy: 0
+                };
+            }
+            
+            // Update chapter statistics
+            chapterStats[chapterName].total++;
+            
+            if (isCorrect) {
+                chapterStats[chapterName].correct++;
+            }
+            
+            // Calculate accuracy percentage
+            chapterStats[chapterName].accuracy = 
+                (chapterStats[chapterName].correct / chapterStats[chapterName].total * 100).toFixed(1);
+                
+            // Save chapter stats
+            saveChapterStats();
+        }
 
+        // Function to save chapter stats to localStorage
+        function saveChapterStats() {
+            safeLocalStorage('set', 'truefalse_chapter_stats', JSON.stringify(chapterStats));
+        }
+
+        // Function to load chapter stats from localStorage
+        function loadChapterStats() {
+            try {
+                const savedStats = safeLocalStorage('get', 'truefalse_chapter_stats');
+                if (savedStats) {
+                    chapterStats = JSON.parse(savedStats);
+                    console.log('Chapter statistics loaded successfully');
+                }
+            } catch (e) {
+                console.error('Error loading chapter statistics:', e);
+                chapterStats = {};
+            }
+        }
         // Load question data and merge with current questions
         function loadQuestionData() {
             try {
@@ -3353,6 +3402,66 @@
             
             stopTimer();
         }
+
+        // Add this function to generate HTML for chapter-based statistics
+        function generateChapterStatsHTML() {
+            // Get chapters that have statistics
+            const chaptersWithStats = Object.keys(chapterStats).filter(
+                chapter => chapterStats[chapter].total > 0
+            );
+            
+            // If no chapters have stats yet, show empty state
+            if (chaptersWithStats.length === 0) {
+                return `
+                <div class="empty-state">
+                    <i class="fas fa-book"></i>
+                    <p>No chapter statistics available yet</p>
+                    <p>Answer questions to see accuracy by chapter</p>
+                </div>
+                `;
+            }
+            
+            // Sort chapters by name
+            chaptersWithStats.sort();
+            
+            // Generate table rows for each chapter
+            const chapterRows = chaptersWithStats.map(chapter => {
+                const stats = chapterStats[chapter];
+                const accuracyClass = getAccuracyClass(parseFloat(stats.accuracy));
+                
+                return `
+                <tr>
+                    <td>${chapter}</td>
+                    <td>${stats.correct}/${stats.total}</td>
+                    <td class="${accuracyClass}">${stats.accuracy}%</td>
+                </tr>
+                `;
+            }).join('');
+            
+            return `
+            <table class="chapter-stats-table">
+                <thead>
+                    <tr>
+                        <th>Chapter</th>
+                        <th>Score</th>
+                        <th>Accuracy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${chapterRows}
+                </tbody>
+            </table>
+            `;
+        }
+
+        // Helper function to determine CSS class based on accuracy
+        function getAccuracyClass(accuracy) {
+            if (accuracy >= 90) return 'accuracy-excellent';
+            if (accuracy >= 70) return 'accuracy-good';
+            if (accuracy >= 50) return 'accuracy-average';
+            return 'accuracy-needs-work';
+        }
+
         function checkAnswer(userAnswer) {
             // Prevent multiple answers for the same question
             if (questionAnswered) return;
@@ -3381,6 +3490,9 @@
             
             // Update session statistics
             updateSessionStats(isCorrect);
+            
+            // Update chapter-level statistics
+            updateChapterStats(currentQuestion, isCorrect);
             
             if (isCorrect) {
                 // Correct answer
@@ -4106,7 +4218,9 @@
                 localStorage.removeItem('truefalse_quiz_state');
                 localStorage.removeItem('truefalse_question_data');
                 localStorage.removeItem('truefalse_global_stats');
+                localStorage.removeItem('truefalse_chapter_stats');
                 
+                chapterStats = {};
                 wrongAnswers = [];
                 bookmarkedQuestions = [];
                 
@@ -4236,6 +4350,9 @@
                 // Load question timing data
                 loadQuestionData();
                 
+                // Load chapter statistics
+                loadChapterStats();
+
                 // Load statistics
                 loadStatistics();
                 
@@ -4537,6 +4654,14 @@
                 
                 ${generateSessionHistoryHTML()}
                 
+                <!-- Add Chapter Statistics Section -->
+                <div class="chapter-stats-section">
+                    <h3>Accuracy by Chapter</h3>
+                    <div class="chapter-stats-content">
+                        ${generateChapterStatsHTML()}
+                    </div>
+                </div>
+
                 <div class="most-missed-section">
                     <h3>Most Frequently Missed Questions</h3>
                     <div class="most-missed-list">
@@ -4697,7 +4822,14 @@
                     sessionsHistory: []
                 };
                 
+                // Clear chapter statistics too
+                chapterStats = {};
+                
+                // Save cleared statistics
                 saveStatistics();
+                saveChapterStats();
+                
+                // Update UI
                 updateStatisticsUI();
                 
                 alert("Statistics have been cleared!");
@@ -4716,11 +4848,15 @@
             return false;
         }
 
-        // CSS styles for statistics
+       // Complete addStatisticsStyles function
         function addStatisticsStyles() {
+            // Check if styles already exist
+            if (document.getElementById('statistics-styles')) return;
+            
             const styleElement = document.createElement('style');
             styleElement.id = 'statistics-styles';
             styleElement.textContent = `
+                /* Main statistics container */
                 .statistics-content {
                     width: 100%;
                     display: flex;
@@ -4728,6 +4864,7 @@
                     gap: 20px;
                 }
                 
+                /* Stats cards for summary data */
                 .statistics-summary, .statistics-time {
                     display: flex;
                     justify-content: space-between;
@@ -4736,96 +4873,68 @@
                 }
                 
                 .stat-card {
-                    background: var(--light);
+                    background: #2a2a2a;
                     border-radius: 10px;
                     padding: 15px;
                     flex: 1;
                     min-width: 120px;
                     text-align: center;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-                    transition: transform 0.2s ease, box-shadow 0.2s ease;
-                }
-                
-                body.dark-mode .stat-card {
-                    background: #2a2a2a;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
                 }
                 
                 .stat-card:hover {
                     transform: translateY(-3px);
-                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
                 }
                 
                 .stat-card-value {
                     font-size: 28px;
                     font-weight: bold;
-                    color: var(--primary);
+                    color: #4cc9f0;
                     margin-bottom: 5px;
-                }
-                
-                body.dark-mode .stat-card-value {
-                    color: var(--success);
                 }
                 
                 .stat-card-label {
                     font-size: 14px;
-                    color: #666;
-                }
-                
-                body.dark-mode .stat-card-label {
                     color: #aaa;
                 }
                 
+                /* Recent sessions section */
                 .sessions-history, .most-missed-section {
-                    background: var(--light);
+                    background: #2a2a2a;
                     border-radius: 10px;
                     padding: 20px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-                }
-                
-                body.dark-mode .sessions-history, 
-                body.dark-mode .most-missed-section {
-                    background: #2a2a2a;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
                 }
                 
-                .sessions-history h3, .most-missed-section h3 {
+                .sessions-history h3, .most-missed-section h3, .chapter-stats-section h3 {
                     margin-top: 0;
                     margin-bottom: 15px;
-                    color: var(--primary);
+                    color: #4cc9f0;
                     font-size: 18px;
+                    font-weight: bold;
                 }
                 
-                body.dark-mode .sessions-history h3, 
-                body.dark-mode .most-missed-section h3 {
-                    color: var(--success);
-                }
-                
+                /* Table styles for sessions */
                 .sessions-table {
                     width: 100%;
                     border-collapse: collapse;
+                    color: #e0e0e0;
                 }
                 
                 .sessions-table th, .sessions-table td {
                     padding: 8px 12px;
                     text-align: left;
-                    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-                }
-                
-                body.dark-mode .sessions-table th, 
-                body.dark-mode .sessions-table td {
                     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
                 }
                 
                 .sessions-table th {
                     font-weight: 600;
-                    color: #555;
+                    color: #aaa;
                 }
                 
-                body.dark-mode .sessions-table th {
-                    color: #ccc;
-                }
-                
+                /* Empty state styling */
                 .empty-state {
                     display: flex;
                     flex-direction: column;
@@ -4838,29 +4947,22 @@
                 .empty-state i {
                     font-size: 40px;
                     margin-bottom: 10px;
-                    color: #ccc;
-                }
-                
-                body.dark-mode .empty-state i {
                     color: #555;
                 }
                 
+                /* Missed questions section */
                 .missed-item {
-                    background: rgba(0, 0, 0, 0.02);
+                    background: rgba(255, 255, 255, 0.05);
                     border-radius: 8px;
                     padding: 12px;
                     margin-bottom: 10px;
                     position: relative;
                 }
                 
-                body.dark-mode .missed-item {
-                    background: rgba(255, 255, 255, 0.05);
-                }
-                
                 .missed-count {
                     font-weight: bold;
                     font-size: 16px;
-                    color: var(--false);
+                    color: #f72585;
                     position: absolute;
                     top: 12px;
                     right: 12px;
@@ -4870,17 +4972,66 @@
                     margin-bottom: 5px;
                     font-weight: 600;
                     padding-right: 30px;
+                    color: #e0e0e0;
                 }
                 
                 .missed-answer {
                     font-size: 14px;
-                    color: #666;
-                }
-                
-                body.dark-mode .missed-answer {
                     color: #aaa;
                 }
                 
+                /* Chapter Statistics Styles */
+                .chapter-stats-section {
+                    background: #2a2a2a;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                }
+                
+                .chapter-stats-content {
+                    margin-top: 15px;
+                }
+                
+                .chapter-stats-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    color: #e0e0e0;
+                }
+                
+                .chapter-stats-table th, .chapter-stats-table td {
+                    padding: 10px 12px;
+                    text-align: left;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                }
+                
+                .chapter-stats-table th {
+                    font-weight: 600;
+                    color: #aaa;
+                }
+                
+                /* Accuracy color indicators - adjusted to match your scheme */
+                .accuracy-excellent {
+                    color: #4CAF50;
+                    font-weight: bold;
+                }
+                
+                .accuracy-good {
+                    color: #4cc9f0;
+                    font-weight: bold;
+                }
+                
+                .accuracy-average {
+                    color: #FF9800;
+                    font-weight: bold;
+                }
+                
+                .accuracy-needs-work {
+                    color: #f72585;
+                    font-weight: bold;
+                }
+                
+                /* Mobile responsive adjustments */
                 @media (max-width: 768px) {
                     .statistics-summary, .statistics-time {
                         display: grid;
@@ -4896,12 +5047,39 @@
                         font-size: 22px;
                     }
                     
-                    .sessions-table {
+                    .sessions-history, .most-missed-section, .chapter-stats-section {
+                        padding: 15px;
+                    }
+                    
+                    .sessions-table, .chapter-stats-table {
                         font-size: 14px;
                     }
                     
-                    .sessions-table th, .sessions-table td {
-                        padding: 6px 8px;
+                    .sessions-table th, .sessions-table td,
+                    .chapter-stats-table th, .chapter-stats-table td {
+                        padding: 8px;
+                    }
+                    
+                    /* Make sure mobile tables don't overflow */
+                    .sessions-table, .chapter-stats-table {
+                        display: block;
+                        overflow-x: auto;
+                        -webkit-overflow-scrolling: touch;
+                    }
+                }
+                
+                /* Smaller screens */
+                @media (max-width: 480px) {
+                    .statistics-summary, .statistics-time {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .stat-card-value {
+                        font-size: 20px;
+                    }
+                    
+                    .stat-card-label {
+                        font-size: 12px;
                     }
                 }
             `;
