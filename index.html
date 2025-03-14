@@ -1821,7 +1821,7 @@
                 <div class="settings-row">
                     <div class="settings-label tooltip">
                         <span>Smart Repetition</span>
-                        <span class="tooltip-text">Shows incorrectly answered questions more frequently</span>
+                        <span class="tooltip-text">Intelligently emphasizes questions you struggle with, prioritizing them based on your performance history and learning needs</span>
                     </div>
                     <div class="settings-control">
                         <label class="switch">
@@ -3178,7 +3178,7 @@
                 elements.bookmarkBtn.classList.remove('active');
             }
         }
-        // Add this function to implement true spaced repetition with endless mode
+        // Find the getNextQuestionIndex function and replace it with this improved version
         function getNextQuestionIndex() {
             // If no questions, return -1
             if (questions.length === 0) return -1;
@@ -3199,34 +3199,68 @@
                 // Skip the current question to avoid immediate repetition
                 if (i === currentIndex) continue;
                 
-                // Start with a base weight
+                // Start with a base weight - all questions get at least this chance
                 let weight = 1;
                 
                 // If spaced repetition is enabled, adjust weights
                 if (spacedRepetitionMode) {
+                    // Find if this question was answered incorrectly before
+                    const wrongQuestion = wrongAnswers.find(q => q.id === question.id);
                     
-                    // Increase weight for questions that were answered incorrectly
-                    const wrongQuestion = wrongAnswers.find(q => q.id === question.id && !q.corrected);
                     if (wrongQuestion) {
-                        // Weight based on miss count - questions missed more have higher probability
-                        weight += (wrongQuestion.missCount || 1) * 5;
+                        // ENHANCED: Higher base multiplier for wrong questions (increased from 5 to 8)
+                        const baseMultiplier = 8;
                         
-                        // Add additional weight based on how many times it still needs to be answered correctly
-                        const correctCount = wrongQuestion.correctCount || 0;
-                        const remainingCorrect = 3 - correctCount; // Assuming 3 correct answers are required
+                        // ENHANCED: More aggressive weighting based on miss count
+                        // The more times it was missed, the more likely it will appear
+                        weight += (wrongQuestion.missCount || 1) * baseMultiplier;
                         
-                        if (remainingCorrect > 0) {
-                            // Higher weight for questions that still need more correct answers
-                            weight += remainingCorrect * 4;
+                        // ENHANCED: Consider how recently it was missed
+                        if (wrongQuestion.lastMissed) {
+                            const daysSinceLastMiss = (new Date() - new Date(wrongQuestion.lastMissed)) / (1000 * 60 * 60 * 24);
                             
-                            // If the question has been recently answered correctly but isn't fully mastered,
-                            // still keep a good weight to ensure it comes up again soon
-                            if (correctCount > 0) {
-                                weight *= 1.5;
+                            // Questions missed within the last day get an extra boost
+                            if (daysSinceLastMiss < 1) {
+                                weight += 5;
+                            } 
+                            // Questions missed within the last week still get some boost
+                            else if (daysSinceLastMiss < 7) {
+                                weight += 3;
+                            }
+                        }
+                        
+                        // ENHANCED: Questions that haven't been mastered yet get priority
+                        if (!wrongQuestion.corrected) {
+                            // Check mastery progress
+                            const correctCount = wrongQuestion.correctCount || 0;
+                            const remainingCorrect = 3 - correctCount; // Assuming 3 correct answers are required
+                            
+                            if (remainingCorrect > 0) {
+                                // Higher weight for questions that still need more correct answers
+                                weight += remainingCorrect * 4;
+                                
+                                // If the question has been recently answered correctly but isn't fully mastered,
+                                // still keep a good weight to ensure it comes up again soon
+                                if (correctCount > 0) {
+                                    weight *= 1.5;
+                                }
                             }
                         }
                     }
+                    
+                    // ENHANCED: Consider when the question was last seen to avoid repetitive patterns
+                    if (question.lastSeen) {
+                        const hoursSinceLastSeen = (new Date() - new Date(question.lastSeen)) / (1000 * 60 * 60);
+                        
+                        // Avoid showing questions seen very recently unless they were wrong
+                        if (!wrongQuestion && hoursSinceLastSeen < 0.5) { // Less than 30 minutes ago
+                            weight *= 0.5; // Reduce likelihood of recently seen questions
+                        }
+                    }
                 }
+                
+                // ENHANCED: Ensure minimum weight to prevent questions from disappearing completely
+                weight = Math.max(weight, 0.5);
                 
                 // Add the question to the pool multiple times based on its weight
                 // This creates a probability distribution
@@ -3294,13 +3328,17 @@
             displayCurrentQuestion();
         }
         
+        // Find and replace the prioritizeWrongAnswers function
         function prioritizeWrongAnswers() {
+            console.log("Prioritizing questions based on performance...");
+            
             // Get the wrong answers data
             const wrongData = wrongAnswers.map(q => ({
                 id: q.id,
                 missCount: q.missCount || 0,
                 correctCount: q.correctCount || 0,
-                corrected: q.corrected || false
+                corrected: q.corrected || false,
+                lastMissed: q.lastMissed || null
             }));
             
             // Sort questions to prioritize correctly
@@ -3308,7 +3346,7 @@
                 const aWrong = wrongData.find(w => w.id === a.id);
                 const bWrong = wrongData.find(w => w.id === b.id);
                 
-                // First check if either is in wrong answers and not fully corrected
+                // First prioritize: questions that have been missed but not fully mastered
                 const aIsWrong = aWrong && !aWrong.corrected ? 1 : 0;
                 const bIsWrong = bWrong && !bWrong.corrected ? 1 : 0;
                 
@@ -3318,7 +3356,7 @@
                 
                 // Both are wrong answers not fully corrected, compare mastery progress
                 if (aIsWrong && bIsWrong) {
-                    // First prioritize by remaining correct answers needed
+                    // Factor 1: Remaining answers needed for mastery
                     const aRemainingCorrect = 3 - (aWrong.correctCount || 0);
                     const bRemainingCorrect = 3 - (bWrong.correctCount || 0);
                     
@@ -3326,13 +3364,26 @@
                         return bRemainingCorrect - aRemainingCorrect; // More remaining correct answers needed first
                     }
                     
-                    // If same mastery level, sort by miss count
-                    return (bWrong.missCount || 0) - (aWrong.missCount || 0);
+                    // Factor 2: If same mastery level, prioritize questions that were missed more often
+                    const aMissCount = aWrong.missCount || 0;
+                    const bMissCount = bWrong.missCount || 0;
+                    
+                    if (aMissCount !== bMissCount) {
+                        return bMissCount - aMissCount; // Higher miss count first
+                    }
+                    
+                    // Factor 3: If still tied, prioritize by recency of being missed
+                    if (aWrong.lastMissed && bWrong.lastMissed) {
+                        return new Date(bWrong.lastMissed) - new Date(aWrong.lastMissed); // More recently missed first
+                    }
                 }
                 
-                // Otherwise, sort by miss count 
+                // For questions that are either both corrected or both never missed,
+                // prioritize by miss count if available
                 return (b.missCount || 0) - (a.missCount || 0);
             });
+            
+            console.log("Questions prioritized successfully!");
         }
 
         function displayCurrentQuestion() {
