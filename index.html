@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4361ee">
-    <title>True/False Study Quiz</title>
+    <title>Patent Bar Drilling</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Your original CSS styles first */
@@ -1571,6 +1571,57 @@
                 max-height: calc(100vh - 250px);
             }
         }
+        .jump-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 20px;
+            transition: color 0.2s ease;
+        }
+
+        .jump-btn:hover {
+            color: white;
+        }
+
+        /* Add this to darken the icon in dark mode */
+        body.dark-mode .jump-btn {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        body.dark-mode .jump-btn:hover {
+            color: white;
+        }
+        /* Mobile-specific improvements for jump button */
+        @media (max-width: 768px) {
+            .jump-btn {
+                /* Increase tap target size */
+                font-size: 24px;
+                padding: 10px;
+                
+                /* Adjust position for mobile - move slightly away from edge */
+                top: 15px;
+                left: 15px;
+            }
+            
+            /* Add active state for touch feedback */
+            .jump-btn:active {
+                transform: scale(0.95);
+                color: white;
+            }
+        }
+
+        /* Default 44px minimum tap target size recommended by WCAG */
+        .jump-btn {
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -1598,8 +1649,11 @@
 
     <div class="app-container">
         <div class="header">
-            <h1>True or False?</h1>
+            <h1>Patent Bar Prep</h1>
             <p id="question-status">Question 0 of 0</p>
+            <button id="jump-btn" class="jump-btn" title="Jump to question" style="display: none;">
+                <i class="fas fa-random"></i>
+            </button>
             <div class="progress-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
@@ -2254,6 +2308,69 @@
             }
         }
 
+        // Function to toggle the jump button visibility based on mode
+        function updateJumpButtonVisibility() {
+            const jumpBtn = document.getElementById('jump-btn');
+            
+            // Only show the jump button if we are in normal mode (not endless) and shuffle is off
+            if (!repeatMode && !shuffleMode && questions.length > 0) {
+                jumpBtn.style.display = 'block';
+                // Change icon to a more appropriate one for jumping
+                jumpBtn.innerHTML = '<i class="fas fa-exchange-alt"></i>';
+            } else {
+                jumpBtn.style.display = 'none';
+            }
+        }
+
+        // Function to handle jumping to a specific question
+        function jumpToQuestion() {
+            // Only allow jumping if in normal mode and shuffle is off
+            if (repeatMode || shuffleMode) return;
+            
+            // Use setTimeout to prevent issues with touch events
+            setTimeout(function() {
+            // Prompt for question number
+            const input = prompt(`Enter question number (1-${questions.length}):`);
+            
+            // Validate input
+            if (input === null) return; // User canceled
+            
+            // Try to parse the input as a number
+            const questionNumber = parseInt(input);
+            
+            // Check if it's a valid question number
+            if (isNaN(questionNumber) || questionNumber < 1 || questionNumber > questions.length) {
+                alert(`Please enter a valid question number between 1 and ${questions.length}.`);
+                return;
+            }
+            
+            // Adjust for zero-based indexing
+            currentIndex = questionNumber - 1;
+            
+            // Reset question state
+            questionAnswered = false;
+            elements.feedback.style.opacity = '0';
+            elements.explanation.style.display = 'none';
+            elements.continueBtn.style.display = 'none';
+            
+            // Remove selected class from both buttons
+            elements.trueBtn.classList.remove('btn-selected');
+            elements.falseBtn.classList.remove('btn-selected');
+            
+            // For mobile
+            if (elements.hintTapArea) {
+                elements.hintTapArea.style.display = 'none';
+            }
+            
+            // Update progress bar
+            const progressPercentage = (currentIndex / questions.length) * 100;
+            elements.progressBar.style.width = `${progressPercentage}%`;
+            
+            // Display the current question
+            displayCurrentQuestion();
+            }, 150); // Small delay for better mobile experience
+        }
+
         // State variables
         let questions = [];
         let currentIndex = 0;
@@ -2453,6 +2570,11 @@
             
             // Rest of your existing DOMContentLoaded function...
             
+            // Add event listener for jump button
+            addSafeEventListener('jump-btn', 'click', jumpToQuestion);
+
+
+
             // Detect if device is touch capable
             isTouchDevice = detectTouchCapability();
             
@@ -2563,12 +2685,15 @@
                     elements.questionCard.style.display = 'block';
                 }, 1500);
             }
+            // Update jump button visibility
+            updateJumpButtonVisibility();
         }
         
         // Update the loadSampleQuestions function to include chapter information
         function loadSampleQuestions() {
             console.log("Loading sample questions...");
-            
+            // Update jump button visibility
+            updateJumpButtonVisibility();
             try {
                 originalQuestions = [
                     {
@@ -2958,36 +3083,37 @@
             
             // Skip header row and process each line
             originalQuestions = lines.slice(1).map((line, index) => {
-                // Better handling of CSV with quoted fields
-                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(part => 
-                    part.replace(/^"(.*)"$/, '$1').trim()
-                );
-                
-                return {
-                    id: `q-${index}`,
-                    question: parts[0],
-                    answer: parts[1],
-                    explanation: parts[2] || "No explanation provided.",
-                    chapter: parts[3] || "Uncategorized", // Add chapter information
-                    missCount: 0, // Track how many times this question was missed
-                    lastSeen: null
-                };
+            // Better handling of CSV with quoted fields
+            const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(part => 
+                part.replace(/^"(.*)"$/, '$1').trim()
+            );
+            
+            return {
+                id: `q-${index}`,
+                originalIndex: index, // Add original index to track position in CSV
+                question: parts[0],
+                answer: parts[1],
+                explanation: parts[2] || "No explanation provided.",
+                chapter: parts[3] || "Uncategorized", // Add chapter information
+                missCount: 0, // Track how many times this question was missed
+                lastSeen: null
+            };
             }).filter(q => q.question && q.answer); // Filter out invalid entries
             
             console.log("Parsed questions:", originalQuestions.length);
             
             // Check if we have questions
             if (originalQuestions.length === 0) {
-                console.error("No valid questions found after parsing CSV");
-                elements.loadingSection.innerHTML = `
-                    <i class="fas fa-exclamation-triangle" style="color: #f72585; font-size: 40px;"></i>
-                    <p style="margin-top: 20px;">No valid questions found in the CSV file.</p>
-                    <p style="margin-top: 10px;">Loading sample questions instead...</p>
-                `;
-                
-                // Load sample questions after a brief delay
-                setTimeout(loadSampleQuestions, 1500);
-                return;
+            console.error("No valid questions found after parsing CSV");
+            elements.loadingSection.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="color: #f72585; font-size: 40px;"></i>
+                <p style="margin-top: 20px;">No valid questions found in the CSV file.</p>
+                <p style="margin-top: 10px;">Loading sample questions instead...</p>
+            `;
+            
+            // Load sample questions after a brief delay
+            setTimeout(loadSampleQuestions, 1500);
+            return;
             }
             
             // Organize questions by chapter before loading saved data
@@ -3033,6 +3159,9 @@
             
             resetQuiz();
             saveSettings();
+            
+            // Update jump button visibility
+            updateJumpButtonVisibility();
         }
 
         function toggleRepeat() {
@@ -3060,6 +3189,9 @@
             }
             
             saveSettings();
+            
+            // Update jump button visibility
+            updateJumpButtonVisibility();
         }
         
         function toggleSpacedRepetition() {
@@ -3718,6 +3850,8 @@
             // Stop the timer if it's running
             stopTimer();
             
+            // Update jump button visibility
+            updateJumpButtonVisibility();
             // Reset state
             currentIndex = 0;
             correctCount = 0;
@@ -3766,6 +3900,11 @@
                 selectedChapterNames.forEach(chapter => {
                     questions = questions.concat(chapterData[chapter].questions.map(q => ({...q})));
                 });
+            }
+            
+            // If shuffle is disabled and spaced repetition is disabled, sort by original index
+            if (!shuffleMode && !spacedRepetitionMode) {
+                questions.sort((a, b) => (a.originalIndex || 0) - (b.originalIndex || 0));
             }
             
             // Apply shuffle if enabled
